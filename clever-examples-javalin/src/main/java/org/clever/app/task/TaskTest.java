@@ -1,4 +1,4 @@
-package org.clever.examples.app.task;
+package org.clever.app.task;
 
 import lombok.extern.slf4j.Slf4j;
 import org.clever.core.DateUtils;

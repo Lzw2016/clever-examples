@@ -1,4 +1,4 @@
-package org.clever.examples.app.mvc;
+package org.clever.app.mvc;
 
 import io.javalin.http.UploadedFile;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.clever.app.mapper.MapperTest;
 import org.clever.core.DateUtils;
 import org.clever.core.http.CookieUtils;
 import org.clever.core.model.request.QueryByPage;
@@ -18,7 +19,6 @@ import org.clever.data.jdbc.DaoFactory;
 import org.clever.data.jdbc.Jdbc;
 import org.clever.data.jdbc.QueryDSL;
 import org.clever.data.jdbc.support.ProcedureJdbcCall;
-import org.clever.examples.app.mapper.MapperTest;
 import org.clever.web.Context;
 import org.clever.web.mvc.annotation.*;
 import org.springframework.http.HttpStatus;

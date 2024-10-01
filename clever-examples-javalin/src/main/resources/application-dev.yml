@@ -7,7 +7,7 @@ startup-task:
     - name: '测试定时任务'
       enable: true
       interval: 120s
-      clazz: 'org.clever.examples.app.task.TaskTest'
+      clazz: 'org.clever.app.task.TaskTest'
       method: 'job01'
   cmd-task:
     - name: '持续编译源码'
@@ -119,7 +119,6 @@ web:
         - './clever-task/out/production/classes'
         #- './clever-examples-javalin/build/classes/java/main'
         #- './clever-examples-javalin/build/classes/kotlin/main'
-        #- './clever-task/build/classes/java/main'
   security:
     enable: false
     data-source:
@@ -129,7 +128,7 @@ web:
       redis-namespace: "security"
 
 timed-task:
-  enable: false
+  enable: true
   standby: true
   jdbc-name: 'postgresql'
   namespace: 'default'

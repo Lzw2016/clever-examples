@@ -1,4 +1,4 @@
-package org.clever.examples.app.mvc;
+package org.clever.app.mvc;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Entity1 {
-    @JsonProperty("name_06")
+    @JsonProperty("name_01")
     private String name;
     private int age;
 }

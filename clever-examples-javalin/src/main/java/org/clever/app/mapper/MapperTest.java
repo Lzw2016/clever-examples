@@ -1,4 +1,4 @@
-package org.clever.examples.app.mapper;
+package org.clever.app.mapper;
 
 import java.util.List;
 import java.util.Map;

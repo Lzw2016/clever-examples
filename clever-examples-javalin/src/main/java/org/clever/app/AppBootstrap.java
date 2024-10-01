@@ -1,4 +1,4 @@
-package org.clever.examples.app;
+package org.clever.app;
 
 import io.javalin.Javalin;
 import lombok.extern.slf4j.Slf4j;
