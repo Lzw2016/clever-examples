@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/clever-examples-javalin/clever-examples.clever-examples-javalin.main.iml" filepath="$PROJECT_DIR$/.idea/modules/clever-examples-javalin/clever-examples.clever-examples-javalin.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/clever-examples-spring/clever-examples.clever-examples-spring.main.iml" filepath="$PROJECT_DIR$/.idea/modules/clever-examples-spring/clever-examples.clever-examples-spring.main.iml" />
     </modules>
   </component>
 </project>
