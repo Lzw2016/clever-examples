@@ -128,7 +128,7 @@ web:
       redis-namespace: "security"
 
 timed-task:
-  enable: true
+  enable: false
   standby: true
   jdbc-name: 'postgresql'
   namespace: 'default'
