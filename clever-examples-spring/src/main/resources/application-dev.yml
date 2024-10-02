@@ -25,10 +25,10 @@ mybatis:
   interval: 1s
   locations:
     - fileType: filesystem
-      location: './clever-examples-javalin/src/main/kotlin'
+      location: './clever-examples-spring/src/main/kotlin'
       filter: '**/*.xml'
     - fileType: filesystem
-      location: './clever-examples-javalin/src/main/java'
+      location: './clever-examples-spring/src/main/java'
       filter: '**/*.xml'
     #- fileType: jar
     #  location: 'classpath*:org/clever/app/**/*.xml'
@@ -81,13 +81,13 @@ web:
   http:
     static-file:
       - hosted-path: '/'
-        directory: './clever-examples-javalin/src/main/resources/static'
+        directory: './clever-examples-spring/src/main/resources/static'
         location: external
   resources:
     enable: true
     mappings:
       - hosted-path: '/'
-        location: './clever-examples-javalin/src/main/resources/static'
+        location: './clever-examples-spring/src/main/resources/static'
   mvc:
     path: '/api/'
     http-method: [ 'POST', 'GET' ]
@@ -115,10 +115,10 @@ web:
         - 'org.clever.task.core.model.AbstractTrigger'
         - 'org.clever.task.core.job.JobContext'
       locations:
-        - './clever-examples-javalin/out/production/classes'
+        - './clever-examples-spring/out/production/classes'
         - './clever-task/out/production/classes'
-        #- './clever-examples-javalin/build/classes/java/main'
-        #- './clever-examples-javalin/build/classes/kotlin/main'
+        #- './clever-examples-spring/build/classes/java/main'
+        #- './clever-examples-spring/build/classes/kotlin/main'
   security:
     enable: false
     data-source:
