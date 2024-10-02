@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 )
 public class StartSpringApp {
     public static void main(String[] args) {
+        System.setProperty("polyglot.engine.WarnInterpreterOnly", "false");
         SpringApplication application = new SpringApplication(StartSpringApp.class);
         application.run(args);
     }
