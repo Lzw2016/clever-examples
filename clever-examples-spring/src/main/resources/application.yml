@@ -13,7 +13,7 @@ logging:
     org.springframework.jdbc.datasource.DataSourceUtils: info
     org.springframework.core.HotReloadClassLoader: debug
     org.springframework.security: debug
-    com.zaxxer.hikari.HikariConfig: debug
+    com.zaxxer.hikari.HikariConfig: info
     #org.eclipse.jetty.util.log: warn
 
 app:

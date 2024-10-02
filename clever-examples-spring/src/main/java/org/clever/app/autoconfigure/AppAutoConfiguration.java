@@ -142,7 +142,7 @@ public class AppAutoConfiguration {
     @Bean
     public FilterRegistrationBean<HttpFilter> globalRequestParamsFilter() {
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
-        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 300);
+        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 400);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("GlobalRequestParamsFilter");
         filterBean.setFilter(new FilterAdapter(GlobalRequestParamsFilter.INSTANCE));
@@ -152,7 +152,7 @@ public class AppAutoConfiguration {
     @Bean
     public FilterRegistrationBean<HttpFilter> corsFilter() {
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
-        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 300);
+        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 500);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("CorsFilter");
         filterBean.setFilter(new FilterAdapter(CorsFilter.create(environment)));
@@ -162,7 +162,7 @@ public class AppAutoConfiguration {
     @Bean
     public FilterRegistrationBean<HttpFilter> mvcHandlerMethodFilter(MvcBootstrap mvcBootstrap) {
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
-        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 300);
+        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 600);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("MvcHandlerMethodFilter");
         filterBean.setFilter(new FilterAdapter(mvcBootstrap.getMvcHandlerMethodFilter()));
@@ -172,7 +172,7 @@ public class AppAutoConfiguration {
     @Bean
     public FilterRegistrationBean<HttpFilter> authenticationFilter(SecurityBootstrap securityBootstrap) {
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
-        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 300);
+        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 700);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("AuthenticationFilter");
         filterBean.setFilter(new FilterAdapter(securityBootstrap.getAuthenticationFilter()));
@@ -182,7 +182,7 @@ public class AppAutoConfiguration {
     @Bean
     public FilterRegistrationBean<HttpFilter> loginFilter(SecurityBootstrap securityBootstrap) {
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
-        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 300);
+        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 800);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("LoginFilter");
         filterBean.setFilter(new FilterAdapter(securityBootstrap.getLoginFilter()));
@@ -192,7 +192,7 @@ public class AppAutoConfiguration {
     @Bean
     public FilterRegistrationBean<HttpFilter> logoutFilter(SecurityBootstrap securityBootstrap) {
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
-        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 300);
+        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 900);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("LogoutFilter");
         filterBean.setFilter(new FilterAdapter(securityBootstrap.getLogoutFilter()));
@@ -202,7 +202,7 @@ public class AppAutoConfiguration {
     @Bean
     public FilterRegistrationBean<HttpFilter> authorizationFilter(SecurityBootstrap securityBootstrap) {
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
-        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 300);
+        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1000);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("AuthorizationFilter");
         filterBean.setFilter(new FilterAdapter(securityBootstrap.getAuthorizationFilter()));
@@ -212,7 +212,7 @@ public class AppAutoConfiguration {
     @Bean
     public FilterRegistrationBean<HttpFilter> staticResourceFilter(AppBasicsConfig appBasicsConfig) {
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
-        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 300);
+        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1100);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("StaticResourceFilter");
         filterBean.setFilter(new FilterAdapter(StaticResourceFilter.create(appBasicsConfig.getRootPath(), environment)));
@@ -222,7 +222,7 @@ public class AppAutoConfiguration {
     @Bean
     public FilterRegistrationBean<HttpFilter> mvcFilter(MvcBootstrap mvcBootstrap) {
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
-        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 300);
+        filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1200);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("MvcFilter");
         filterBean.setFilter(new FilterAdapter(mvcBootstrap.getMvcFilter()));
