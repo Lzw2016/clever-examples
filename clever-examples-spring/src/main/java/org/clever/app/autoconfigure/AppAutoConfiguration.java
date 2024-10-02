@@ -1,5 +1,9 @@
 package org.clever.app.autoconfigure;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.javalin.Javalin;
+import io.javalin.json.JavalinJackson;
+import io.javalin.json.JsonMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpFilter;
@@ -10,16 +14,16 @@ import lombok.Getter;
 import org.clever.core.AppBasicsConfig;
 import org.clever.core.AppContextHolder;
 import org.clever.core.Assert;
+import org.clever.core.json.jackson.JacksonConfig;
+import org.clever.core.reflection.ReflectionsUtils;
 import org.clever.core.task.StartupTaskBootstrap;
 import org.clever.data.jdbc.JdbcBootstrap;
 import org.clever.data.redis.RedisBootstrap;
 import org.clever.security.SecurityBootstrap;
 import org.clever.task.TaskBootstrap;
 import org.clever.task.ext.JsExecutorBootstrap;
-import org.clever.web.FilterRegistrar;
-import org.clever.web.MvcBootstrap;
-import org.clever.web.PathConstants;
-import org.clever.web.WebServerBootstrap;
+import org.clever.web.*;
+import org.clever.web.config.WebConfig;
 import org.clever.web.filter.*;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -30,6 +34,8 @@ import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * 作者：lizw <br/>
@@ -240,12 +246,33 @@ public class AppAutoConfiguration {
     }
 
     @Bean
-    public FilterRegistrationBean<HttpFilter> mvcFilter(MvcBootstrap mvcBootstrap) {
+    public FilterRegistrationBean<HttpFilter> mvcFilter(MvcBootstrap mvcBootstrap, WebServerBootstrap webServerBootstrap, ObjectMapper webServerMapper) {
+        WebConfig webConfig = webServerBootstrap.getWebConfig();
+        JacksonConfig jackson = Optional.ofNullable(webConfig.getJackson()).orElseGet(() -> {
+            webConfig.setJackson(new JacksonConfig());
+            return webConfig.getJackson();
+        });
+        Javalin javalin = webServerBootstrap.init(config -> {
+            JsonMapper jsonMapper = new JavalinJackson(webServerMapper, webConfig.isUseVirtualThreads());
+            jackson.apply(webServerMapper);
+            config.jsonMapper(jsonMapper);
+            Map<?, ?> data = ReflectionsUtils.getFieldValue(config.pvt.appDataManager, "data");
+            data.remove(JavalinAppDataKey.OBJECT_MAPPER_KEY);
+            data.remove(JavalinAppDataKey.JSON_MAPPER_KEY);
+            config.appData(JavalinAppDataKey.OBJECT_MAPPER_KEY, webServerMapper);
+            config.appData(JavalinAppDataKey.JSON_MAPPER_KEY, jsonMapper);
+            AppContextHolder.removeBean("javalinJsonMapper");
+            AppContextHolder.removeBean("javalinObjectMapper");
+            AppContextHolder.registerBean("javalinJsonMapper", jsonMapper, true);
+            AppContextHolder.registerBean("javalinObjectMapper", webServerMapper, true);
+        });
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
         filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1200);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("MvcFilter");
-        filterBean.setFilter(new FilterAdapter(mvcBootstrap.getMvcFilter()));
+        MvcFilter mvcFilter = mvcBootstrap.getMvcFilter();
+        mvcFilter.onStart(javalin.unsafeConfig());
+        filterBean.setFilter(new FilterAdapter(mvcFilter));
         return filterBean;
     }
 
