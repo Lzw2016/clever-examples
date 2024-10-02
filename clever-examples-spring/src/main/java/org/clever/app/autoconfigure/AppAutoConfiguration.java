@@ -102,12 +102,32 @@ public class AppAutoConfiguration {
     }
 
     // --------------------------------------------------------------------------------------------
-    // HttpFilter
+    // HttpFilter(servlet过滤器链)
+    //
+    // ApplyConfigFilter (应用web配置)
+    // 🡓
+    // EchoFilter (请求日志)
+    // 🡓
+    // ExceptionHandlerFilter (异常处理)
+    // 🡓
+    // GlobalRequestParamsFilter (获取全局请求参数)
+    // 🡓
+    // CorsFilter (跨域处理)
+    // 🡓
+    // MvcHandlerMethodFilter (解析获取MVC的HandlerMethod)
+    // 🡓
+    // [Security]AuthenticationFilter (身份认证拦截)
+    // 🡓
+    // [Security]LoginFilter (登录拦截)
+    // 🡓
+    // [Security]LogoutFilter (登出拦截)
+    // 🡓
+    // [Security]AuthorizationFilter (权限授权拦截)
+    // 🡓
+    // StaticResourceFilter (静态资源)
+    // 🡓
+    // MvcFilter (MVC功能)
     // --------------------------------------------------------------------------------------------
-
-    /**
-     *
-     */
 
     @Bean
     public FilterRegistrationBean<HttpFilter> applyConfigFilter(AppBasicsConfig appBasicsConfig, WebServerBootstrap webServerBootstrap) {
