@@ -54,24 +54,24 @@ jdbc:
       - 'select 1 from dual'
       - 'select now()'
       - 'select now(6) from dual'
-#    ignore-contains-sql:
-#      - 'pg_advisory'
-#      - 'pg_try_advisory'
-#      - ' task_http_job '
-#      - ' task_java_job '
-#      - ' task_job '
-#      - ' task_job_log '
-#      - ' task_job_trigger '
-#      - ' task_job_trigger_log '
-#      - ' task_js_job '
-#      - ' task_report '
-#      - ' task_scheduler '
-#      - ' task_scheduler_log '
-#      - ' task_shell_job '
-#      - ' task_job_console_log '
-#      - ' task_scheduler_cmd '
-#    ignore-thread:
-#      - 'task-scheduler-pool-'
+    ignore-contains-sql:
+      - 'pg_advisory'
+      - 'pg_try_advisory'
+      - ' task_http_job '
+      - ' task_java_job '
+      - ' task_job '
+      - ' task_job_log '
+      - ' task_job_trigger '
+      - ' task_job_trigger_log '
+      - ' task_js_job '
+      - ' task_report '
+      - ' task_scheduler '
+      - ' task_scheduler_log '
+      - ' task_shell_job '
+      - ' task_job_console_log '
+      - ' task_scheduler_cmd '
+    ignore-thread:
+      - 'task-scheduler-pool-'
   metrics:
     enable: true
     max-sql-count: 200
