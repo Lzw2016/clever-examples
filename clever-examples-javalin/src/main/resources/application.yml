@@ -93,8 +93,9 @@ web:
   enable-http-allowed-methods-on-routes: false
   enable-redirect-to-lowercase-paths: false
   jackson:
-    locale: 'zh_CN'
     date-format: 'yyyy-MM-dd HH:mm:ss'
+    locale: 'zh_CN'
+    time-zone: 'GMT+8'
   http:
     context-path: '/'
     generate-etags: true

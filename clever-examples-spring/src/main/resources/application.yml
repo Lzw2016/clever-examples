@@ -1,6 +1,30 @@
+server:
+  address: '0.0.0.0'
+  port: 9090
+  servlet:
+    context-path: '/'
+    encoding:
+      charset: UTF-8
+      force: false
+  tomcat:
+    threads:
+      max: 200
+
 spring:
   application.name: clever
   profiles.active: dev
+  servlet:
+    multipart:
+      enabled: true
+      max-request-size: 10MB
+      max-file-size: 10MB
+  mvc:
+    converters:
+      preferred-json-mapper: jackson
+  jackson:
+    date-format: 'yyyy-MM-dd HH:mm:ss'
+    locale: 'zh_CN'
+    time-zone: 'GMT+8'
 
 logging:
   config: classpath:logback-spring.xml
@@ -30,24 +54,24 @@ jdbc:
       - 'select 1 from dual'
       - 'select now()'
       - 'select now(6) from dual'
-    ignore-contains-sql:
-      - 'pg_advisory'
-      - 'pg_try_advisory'
-      - ' task_http_job '
-      - ' task_java_job '
-      - ' task_job '
-      - ' task_job_log '
-      - ' task_job_trigger '
-      - ' task_job_trigger_log '
-      - ' task_js_job '
-      - ' task_report '
-      - ' task_scheduler '
-      - ' task_scheduler_log '
-      - ' task_shell_job '
-      - ' task_job_console_log '
-      - ' task_scheduler_cmd '
-    ignore-thread:
-      - 'task-scheduler-pool-'
+#    ignore-contains-sql:
+#      - 'pg_advisory'
+#      - 'pg_try_advisory'
+#      - ' task_http_job '
+#      - ' task_java_job '
+#      - ' task_job '
+#      - ' task_job_log '
+#      - ' task_job_trigger '
+#      - ' task_job_trigger_log '
+#      - ' task_js_job '
+#      - ' task_report '
+#      - ' task_scheduler '
+#      - ' task_scheduler_log '
+#      - ' task_shell_job '
+#      - ' task_job_console_log '
+#      - ' task_scheduler_cmd '
+#    ignore-thread:
+#      - 'task-scheduler-pool-'
   metrics:
     enable: true
     max-sql-count: 200
@@ -82,19 +106,11 @@ redis:
       time-between-eviction-runs: 1m
 
 web:
-  host: '0.0.0.0'
-  port: 9090
-  show-javalin-banner: false
   use-virtual-threads: false
-  thread-pool-max: 250
-  thread-pool-min: 8
-  thread-pool-name: 'jetty-exec'
-  enable-dev-logging: false
-  enable-http-allowed-methods-on-routes: false
-  enable-redirect-to-lowercase-paths: false
   jackson:
-    locale: 'zh_CN'
     date-format: 'yyyy-MM-dd HH:mm:ss'
+    locale: 'zh_CN'
+    time-zone: 'GMT+8'
   http:
     context-path: '/'
     generate-etags: true

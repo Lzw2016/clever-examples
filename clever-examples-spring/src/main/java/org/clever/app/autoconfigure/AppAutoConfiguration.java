@@ -1,7 +1,7 @@
 package org.clever.app.autoconfigure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.javalin.Javalin;
+import io.javalin.config.JavalinConfig;
 import io.javalin.json.JavalinJackson;
 import io.javalin.json.JsonMapper;
 import jakarta.servlet.FilterChain;
@@ -22,10 +22,16 @@ import org.clever.data.redis.RedisBootstrap;
 import org.clever.security.SecurityBootstrap;
 import org.clever.task.TaskBootstrap;
 import org.clever.task.ext.JsExecutorBootstrap;
-import org.clever.web.*;
+import org.clever.web.FilterRegistrar;
+import org.clever.web.JavalinAppDataKey;
+import org.clever.web.MvcBootstrap;
+import org.clever.web.PathConstants;
+import org.clever.web.config.HttpConfig;
 import org.clever.web.config.WebConfig;
 import org.clever.web.filter.*;
+import org.clever.web.utils.ApplyWebConfig;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -90,8 +96,24 @@ public class AppAutoConfiguration {
     }
 
     @Bean
-    public WebServerBootstrap webServerBootstrap(AppBasicsConfig appBasicsConfig) {
-        return WebServerBootstrap.create(appBasicsConfig.getRootPath(), environment);
+    public WebConfig webConfig() {
+        WebConfig webConfig = Binder.get(environment).bind(WebConfig.PREFIX, WebConfig.class).orElseGet(WebConfig::new);
+        //
+        Optional.ofNullable(webConfig.getJackson()).orElseGet(() -> {
+            webConfig.setJackson(new JacksonConfig());
+            return webConfig.getJackson();
+        });
+        // 仅使用 defaultContentType、defaultCharacterEncoding
+        HttpConfig http = Optional.ofNullable(webConfig.getHttp()).orElseGet(() -> {
+            webConfig.setHttp(new HttpConfig());
+            return webConfig.getHttp();
+        });
+        // 仅在
+        Optional.ofNullable(http.getMultipart()).orElseGet(() -> {
+            http.setMultipart(new HttpConfig.Multipart());
+            return http.getMultipart();
+        });
+        return webConfig;
     }
 
     @Bean
@@ -136,12 +158,12 @@ public class AppAutoConfiguration {
     // --------------------------------------------------------------------------------------------
 
     @Bean
-    public FilterRegistrationBean<HttpFilter> applyConfigFilter(AppBasicsConfig appBasicsConfig, WebServerBootstrap webServerBootstrap) {
+    public FilterRegistrationBean<HttpFilter> applyConfigFilter(AppBasicsConfig appBasicsConfig, WebConfig webConfig) {
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
         filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 100);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("ApplyConfigFilter");
-        filterBean.setFilter(new FilterAdapter(ApplyConfigFilter.create(appBasicsConfig.getRootPath(), webServerBootstrap.getWebConfig())));
+        filterBean.setFilter(new FilterAdapter(ApplyConfigFilter.create(appBasicsConfig.getRootPath(), webConfig)));
         return filterBean;
     }
 
@@ -246,32 +268,34 @@ public class AppAutoConfiguration {
     }
 
     @Bean
-    public FilterRegistrationBean<HttpFilter> mvcFilter(MvcBootstrap mvcBootstrap, WebServerBootstrap webServerBootstrap, ObjectMapper webServerMapper) {
-        WebConfig webConfig = webServerBootstrap.getWebConfig();
+    public FilterRegistrationBean<HttpFilter> mvcFilter(AppBasicsConfig appBasicsConfig, WebConfig webConfig, MvcBootstrap mvcBootstrap, ObjectMapper webServerMapper) {
         JacksonConfig jackson = Optional.ofNullable(webConfig.getJackson()).orElseGet(() -> {
             webConfig.setJackson(new JacksonConfig());
             return webConfig.getJackson();
         });
-        Javalin javalin = webServerBootstrap.init(config -> {
-            JsonMapper jsonMapper = new JavalinJackson(webServerMapper, webConfig.isUseVirtualThreads());
-            jackson.apply(webServerMapper);
-            config.jsonMapper(jsonMapper);
-            Map<?, ?> data = ReflectionsUtils.getFieldValue(config.pvt.appDataManager, "data");
-            data.remove(JavalinAppDataKey.OBJECT_MAPPER_KEY);
-            data.remove(JavalinAppDataKey.JSON_MAPPER_KEY);
-            config.appData(JavalinAppDataKey.OBJECT_MAPPER_KEY, webServerMapper);
-            config.appData(JavalinAppDataKey.JSON_MAPPER_KEY, jsonMapper);
-            AppContextHolder.removeBean("javalinJsonMapper");
-            AppContextHolder.removeBean("javalinObjectMapper");
-            AppContextHolder.registerBean("javalinJsonMapper", jsonMapper, true);
-            AppContextHolder.registerBean("javalinObjectMapper", webServerMapper, true);
-        });
+        // 应用配置
+        JavalinConfig javalinConfig = new JavalinConfig();
+        ApplyWebConfig.applyConfig(appBasicsConfig.getRootPath(), webConfig, javalinConfig);
+        // 修正 ObjectMapper、JsonMapper 属性
+        JsonMapper jsonMapper = new JavalinJackson(webServerMapper, webConfig.isUseVirtualThreads());
+        jackson.apply(webServerMapper);
+        javalinConfig.jsonMapper(jsonMapper);
+        Map<?, ?> data = ReflectionsUtils.getFieldValue(javalinConfig.pvt.appDataManager, "data");
+        data.remove(JavalinAppDataKey.OBJECT_MAPPER_KEY);
+        data.remove(JavalinAppDataKey.JSON_MAPPER_KEY);
+        javalinConfig.appData(JavalinAppDataKey.OBJECT_MAPPER_KEY, webServerMapper);
+        javalinConfig.appData(JavalinAppDataKey.JSON_MAPPER_KEY, jsonMapper);
+        AppContextHolder.removeBean("javalinJsonMapper");
+        AppContextHolder.removeBean("javalinObjectMapper");
+        AppContextHolder.registerBean("javalinJsonMapper", jsonMapper, true);
+        AppContextHolder.registerBean("javalinObjectMapper", webServerMapper, true);
+        // 创建 MvcFilter
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
         filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1200);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("MvcFilter");
         MvcFilter mvcFilter = mvcBootstrap.getMvcFilter();
-        mvcFilter.onStart(javalin.unsafeConfig());
+        mvcFilter.onStart(javalinConfig);
         filterBean.setFilter(new FilterAdapter(mvcFilter));
         return filterBean;
     }
