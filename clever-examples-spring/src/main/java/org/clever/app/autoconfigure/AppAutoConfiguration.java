@@ -18,6 +18,7 @@ import org.clever.core.json.jackson.JacksonConfig;
 import org.clever.core.reflection.ReflectionsUtils;
 import org.clever.core.task.StartupTaskBootstrap;
 import org.clever.data.jdbc.JdbcBootstrap;
+import org.clever.data.jdbc.config.JdbcConfig;
 import org.clever.data.redis.RedisBootstrap;
 import org.clever.security.SecurityBootstrap;
 import org.clever.task.TaskBootstrap;
@@ -49,8 +50,8 @@ import java.util.Optional;
  */
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
 @Configuration
-@Getter
 @AllArgsConstructor
+@Getter
 public class AppAutoConfiguration {
     private final Environment environment;
 
@@ -117,8 +118,9 @@ public class AppAutoConfiguration {
     }
 
     @Bean
-    public MvcBootstrap mvcBootstrap(AppBasicsConfig appBasicsConfig) {
-        return MvcBootstrap.create(appBasicsConfig.getRootPath(), environment);
+    public MvcBootstrap mvcBootstrap(AppBasicsConfig appBasicsConfig, JdbcBootstrap jdbcBootstrap) {
+        JdbcConfig jdbcConfig = jdbcBootstrap.getJdbcConfig();
+        return MvcBootstrap.create(appBasicsConfig.getRootPath(), jdbcConfig.getDefaultName(), environment);
     }
 
     @DependsOn({"jdbcBootstrap", "redisBootstrap"})
@@ -198,12 +200,17 @@ public class AppAutoConfiguration {
     }
 
     @Bean
-    public FilterRegistrationBean<HttpFilter> corsFilter() {
+    public CorsFilter rawCorsFilter() {
+        return CorsFilter.create(environment);
+    }
+
+    @Bean
+    public FilterRegistrationBean<HttpFilter> corsFilter(CorsFilter corsFilter) {
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
         filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 500);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("CorsFilter");
-        filterBean.setFilter(new FilterAdapter(CorsFilter.create(environment)));
+        filterBean.setFilter(new FilterAdapter(corsFilter));
         return filterBean;
     }
 
@@ -258,12 +265,17 @@ public class AppAutoConfiguration {
     }
 
     @Bean
-    public FilterRegistrationBean<HttpFilter> staticResourceFilter(AppBasicsConfig appBasicsConfig) {
+    public StaticResourceFilter rawStaticResourceFilter(AppBasicsConfig appBasicsConfig) {
+        return StaticResourceFilter.create(appBasicsConfig.getRootPath(), environment);
+    }
+
+    @Bean
+    public FilterRegistrationBean<HttpFilter> staticResourceFilter(StaticResourceFilter staticResourceFilter) {
         FilterRegistrationBean<HttpFilter> filterBean = new FilterRegistrationBean<>();
         filterBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1100);
         filterBean.addUrlPatterns(PathConstants.ALL);
         filterBean.setName("StaticResourceFilter");
-        filterBean.setFilter(new FilterAdapter(StaticResourceFilter.create(appBasicsConfig.getRootPath(), environment)));
+        filterBean.setFilter(new FilterAdapter(staticResourceFilter));
         return filterBean;
     }
 
