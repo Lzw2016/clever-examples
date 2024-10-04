@@ -34,7 +34,6 @@ import org.clever.web.config.WebConfig;
 import org.clever.web.filter.*;
 import org.clever.web.utils.ApplyWebConfig;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -120,8 +119,8 @@ public class AppAutoConfiguration {
         return webConfig;
     }
 
-    @Bean
-    @ConditionalOnMissingBean(MultipartConfigElement.class)
+    // @Bean
+    // @ConditionalOnMissingBean(MultipartConfigElement.class)
     public MultipartConfigElement multipartConfigElement(AppBasicsConfig appBasicsConfig, WebConfig webConfig) {
         HttpConfig.Multipart multipart = webConfig.getHttp().getMultipart();
         return new MultipartConfigElement(
