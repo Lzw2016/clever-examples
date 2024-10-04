@@ -5,6 +5,7 @@ import io.javalin.config.JavalinConfig;
 import io.javalin.json.JavalinJackson;
 import io.javalin.json.JsonMapper;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import lombok.Getter;
 import org.clever.core.AppBasicsConfig;
 import org.clever.core.AppContextHolder;
 import org.clever.core.Assert;
+import org.clever.core.ResourcePathUtils;
 import org.clever.core.json.jackson.JacksonConfig;
 import org.clever.core.reflection.ReflectionsUtils;
 import org.clever.core.task.StartupTaskBootstrap;
@@ -99,7 +101,7 @@ public class AppAutoConfiguration {
     @Bean
     public WebConfig webConfig() {
         WebConfig webConfig = Binder.get(environment).bind(WebConfig.PREFIX, WebConfig.class).orElseGet(WebConfig::new);
-        //
+        // Jackson配置
         Optional.ofNullable(webConfig.getJackson()).orElseGet(() -> {
             webConfig.setJackson(new JacksonConfig());
             return webConfig.getJackson();
@@ -109,12 +111,23 @@ public class AppAutoConfiguration {
             webConfig.setHttp(new HttpConfig());
             return webConfig.getHttp();
         });
-        // 仅在
+        // 文件上传的相关配置
         Optional.ofNullable(http.getMultipart()).orElseGet(() -> {
             http.setMultipart(new HttpConfig.Multipart());
             return http.getMultipart();
         });
         return webConfig;
+    }
+
+    @Bean
+    public MultipartConfigElement multipartConfigElement(AppBasicsConfig appBasicsConfig, WebConfig webConfig) {
+        HttpConfig.Multipart multipart = webConfig.getHttp().getMultipart();
+        return new MultipartConfigElement(
+            ResourcePathUtils.getAbsolutePath(appBasicsConfig.getRootPath(), multipart.getLocation()),
+            multipart.getMaxFileSize().toBytes(),
+            multipart.getMaxTotalRequestSize().toBytes(),
+            (int) multipart.getMaxInMemoryFileSize().toBytes()
+        );
     }
 
     @Bean
