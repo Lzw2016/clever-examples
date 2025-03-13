@@ -31,5 +31,10 @@
       <option name="name" value="maven2" />
       <option name="url" value="http://all.msvc.top:30005/api/packages/clever/maven/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="MavenLocal" />
+      <option name="name" value="MavenLocal" />
+      <option name="url" value="file:/$PROJECT_DIR$/../../../ToolsSoftware/Maven/.m2/repository/" />
+    </remote-repository>
   </component>
 </project>
