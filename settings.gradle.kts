@@ -4,9 +4,9 @@ pluginManagement {
         gradlePluginPortal()
     }
     plugins {
-        id("io.spring.dependency-management").version("1.1.6")
-        id("org.springframework.boot").version("3.3.4")
-        id("org.jetbrains.kotlin.jvm").version("2.0.20")
+        id("io.spring.dependency-management").version("1.1.7")
+        id("org.springframework.boot").version("3.3.12")
+        id("org.jetbrains.kotlin.jvm").version("2.1.21")
     }
 }
 
