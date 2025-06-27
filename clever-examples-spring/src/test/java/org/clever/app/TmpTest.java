@@ -46,7 +46,7 @@ public class TmpTest {
     @Test
     public void test02() {
         String corn = "10 * * * * ?";
-        // corn = "10 * * * * *";
+         corn = "* * * ? * 1,2 *";
         List<String> res = CronExpressionUtil.getNextTimeStrList(corn, 10);
         log.info("res=\n{}", StringUtils.join(res, "\n"));
     }

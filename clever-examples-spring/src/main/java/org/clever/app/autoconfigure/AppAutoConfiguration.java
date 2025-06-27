@@ -17,6 +17,7 @@ import org.clever.core.AppContextHolder;
 import org.clever.core.Assert;
 import org.clever.core.ResourcePathUtils;
 import org.clever.core.json.jackson.JacksonConfig;
+import org.clever.core.mapper.JacksonMapper;
 import org.clever.core.reflection.ReflectionsUtils;
 import org.clever.core.task.StartupTaskBootstrap;
 import org.clever.data.jdbc.JdbcBootstrap;
@@ -303,6 +304,7 @@ public class AppAutoConfiguration {
         JavalinConfig javalinConfig = new JavalinConfig();
         ApplyWebConfig.applyConfig(appBasicsConfig.getRootPath(), webConfig, javalinConfig);
         // 修正 ObjectMapper、JsonMapper 属性
+        JacksonMapper.configure(webServerMapper);
         JsonMapper jsonMapper = new JavalinJackson(webServerMapper, webConfig.isUseVirtualThreads());
         jackson.apply(webServerMapper);
         javalinConfig.jsonMapper(jsonMapper);

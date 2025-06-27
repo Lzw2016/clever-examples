@@ -45,7 +45,7 @@ public class MvcTest {
         entity1.setName("ABC");
 
         Map<String, Object> res = new LinkedHashMap<>();
-        res.put("a", 1);
+        res.put("a", 123L);
         res.put("b", entity1);
         res.put("c", true);
         res.put("d", new Date());
