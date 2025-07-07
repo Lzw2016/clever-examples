@@ -9,10 +9,12 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.38/57f8f5e02e92a30fd21b80cbd426a4172b5f8e29/lombok-1.18.38.jar" />
         </processorPath>
-        <module name="clever-examples.clever-examples-spring.main" />
-        <module name="clever-examples.clever-examples-javalin.main" />
-        <module name="clever-examples.clever-examples-javalin.test" />
-        <module name="clever-examples.clever-examples-spring.test" />
+        <module name="clever-examples.clever-example-javalin.test" />
+        <module name="clever-examples.clever-example-spring.main" />
+        <module name="clever-examples.clever-task-example.test" />
+        <module name="clever-examples.clever-example-javalin.main" />
+        <module name="clever-examples.clever-example-spring.test" />
+        <module name="clever-examples.clever-task-example.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="17" />

@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="StartApp" type="Application" factoryName="Application" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="org.clever.app.StartApp" />
-    <module name="clever-examples.clever-examples-javalin.main" />
+    <module name="clever-examples.clever-example-javalin.main" />
     <option name="VM_PARAMETERS" value="-Xms32m -Xmx256m" />
     <extension name="coverage">
       <pattern>

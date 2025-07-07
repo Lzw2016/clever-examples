@@ -10,8 +10,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/clever-examples-javalin" />
-            <option value="$PROJECT_DIR$/clever-examples-spring" />
+            <option value="$PROJECT_DIR$/clever-example-javalin" />
+            <option value="$PROJECT_DIR$/clever-example-spring" />
+            <option value="$PROJECT_DIR$/clever-task-example" />
           </set>
         </option>
       </GradleProjectSettings>

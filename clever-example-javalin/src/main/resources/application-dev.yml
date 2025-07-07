@@ -25,10 +25,10 @@ mybatis:
   interval: 1s
   locations:
     - fileType: filesystem
-      location: './clever-examples-spring/src/main/kotlin'
+      location: './clever-example-javalin/src/main/kotlin'
       filter: '**/*.xml'
     - fileType: filesystem
-      location: './clever-examples-spring/src/main/java'
+      location: './clever-example-javalin/src/main/java'
       filter: '**/*.xml'
     #- fileType: jar
     #  location: 'classpath*:org/clever/app/**/*.xml'
@@ -42,14 +42,14 @@ jdbc:
   default-name: 'mysql'
   data-source:
     mysql:
-      jdbc-url: jdbc:p6spy:mysql://192.168.1.211:30019/test
+      jdbc-url: jdbc:p6spy:mysql://192.168.1.201:30019/test
       username: admin
       password: admin123456
       minimum-idle: 2
       maximum-pool-size: 100
       connection-test-query: 'select 1 from dual'
     postgresql:
-      jdbc-url: jdbc:p6spy:postgresql://192.168.1.211:30010/test
+      jdbc-url: jdbc:p6spy:postgresql://192.168.1.201:30010/test
       username: admin
       password: admin123456
       minimum-idle: 2
@@ -72,7 +72,7 @@ redis:
     default:
       mode: standalone
       standalone:
-        host: '192.168.1.211'
+        host: '192.168.1.201'
         port: 30007
         database: 0
         password: 'admin123456'
@@ -81,13 +81,13 @@ web:
   http:
     static-file:
       - hosted-path: '/'
-        directory: './clever-examples-spring/src/main/resources/static'
+        directory: './clever-example-javalin/src/main/resources/static'
         location: external
   resources:
     enable: true
     mappings:
       - hosted-path: '/'
-        location: './clever-examples-spring/src/main/resources/static'
+        location: './clever-example-javalin/src/main/resources/static'
   mvc:
     path: '/api/'
     http-method: [ 'POST', 'GET' ]
@@ -115,10 +115,10 @@ web:
         - 'org.clever.task.core.model.AbstractTrigger'
         - 'org.clever.task.core.job.JobContext'
       locations:
-        - './clever-examples-spring/out/production/classes'
+        - './clever-example-javalin/out/production/classes'
         - './clever-task/out/production/classes'
-        #- './clever-examples-spring/build/classes/java/main'
-        #- './clever-examples-spring/build/classes/kotlin/main'
+        #- './clever-example-javalin/build/classes/java/main'
+        #- './clever-example-javalin/build/classes/kotlin/main'
   security:
     enable: false
     data-source:
@@ -128,7 +128,7 @@ web:
       redis-namespace: "security"
 
 timed-task:
-  enable: false
+  enable: true
   standby: true
   jdbc-name: 'postgresql'
   namespace: 'default'

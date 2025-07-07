@@ -11,5 +11,6 @@ pluginManagement {
 }
 
 rootProject.name = "clever-examples"
-include("clever-examples-javalin")
-include("clever-examples-spring")
+include("clever-example-javalin")
+include("clever-example-spring")
+include("clever-task-example")
