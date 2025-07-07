@@ -1,6 +1,6 @@
 spring:
   application.name: clever
-  profiles.active: task-01
+  profiles.active: dev
 
 logging:
   config: classpath:logback-spring.xml
