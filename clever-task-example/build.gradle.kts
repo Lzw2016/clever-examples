@@ -84,7 +84,7 @@ tasks.register("copyResources", Copy::class) {
 // 配置启动jar
 tasks.jar {
     enabled = true
-    manifest.attributes["Main-Class"] = "org.clever.app.StartApp"
+    manifest.attributes["Main-Class"] = "org.clever.app.StartTaskApp"
     // lib/jar 加入 classPath
     val classPaths = project.configurations.runtimeClasspath.get().files.map { file -> "lib/${file.name}" }.toMutableList()
     // // resources 资源加入 classPath (当没有把resources资源编译进jar包时很有用)

@@ -3,7 +3,7 @@ logging.file:
   path: '/data/logs/${logging.file.name}'
 
 app:
-  root-path: '/app'
+  root-path: '/home/lizw/.jenkins/workspace/clever-app-task-01/clever-task-example/build/runtime'
 
 startup-task:
   pool-size: 8
