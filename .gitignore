@@ -74,3 +74,5 @@ node_modules
 logs
 .httpCache
 shell_job_log
+clever-task-example/chronicle*
+clever-task-example/rocksdb*

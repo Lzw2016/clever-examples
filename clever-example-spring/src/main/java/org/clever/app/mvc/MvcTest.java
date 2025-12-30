@@ -19,6 +19,7 @@ import org.clever.data.jdbc.DaoFactory;
 import org.clever.data.jdbc.Jdbc;
 import org.clever.data.jdbc.QueryDSL;
 import org.clever.data.jdbc.support.ProcedureJdbcCall;
+import org.clever.data.jdbc.support.SqlUtils;
 import org.clever.web.Context;
 import org.clever.web.mvc.annotation.*;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,14 @@ import java.util.*;
 public class MvcTest {
     // 无参数
     public static Object t01() {
+        Class<?> clazz = SqlUtils.class;
+        java.security.ProtectionDomain pd = clazz.getProtectionDomain();
+        java.security.CodeSource cs = pd.getCodeSource();
+        java.net.URL location = cs.getLocation();
+        if (location != null) {
+            log.info("-> {}", location.getPath());
+        }
+
         Entity1 entity1 = new Entity1();
         entity1.setAge(1);
         entity1.setName("ABC");

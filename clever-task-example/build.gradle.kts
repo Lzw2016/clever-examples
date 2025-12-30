@@ -26,6 +26,11 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("com.oracle.database.jdbc:ojdbc8")
+
+    api("com.esotericsoftware:kryo:5.6.2")
+    // api("net.openhft:chronicle-wire:2.27ea13")
+    api("net.openhft:chronicle-queue:5.27ea11")
+    api("org.rocksdb:rocksdbjni:10.2.1")
 }
 
 sourceSets {
