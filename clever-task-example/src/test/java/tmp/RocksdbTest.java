@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.rocksdb.*;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -135,7 +137,10 @@ public class RocksdbTest {
                     Output output = new Output(baos);
                     kryo.writeObject(output, data);
                     output.close();
-                    writeBatch.put(String.valueOf(count).getBytes(StandardCharsets.UTF_8), baos.toByteArray());
+                    ByteBuffer buffer = ByteBuffer.allocate(8);
+                    buffer.order(ByteOrder.BIG_ENDIAN);
+                    buffer.putLong(count);
+                    writeBatch.put(buffer.array(), baos.toByteArray());
                 }
                 WriteOptions writeOptions = new WriteOptions();
                 writeOptions.setDisableWAL(true);
@@ -175,6 +180,9 @@ public class RocksdbTest {
         // [写]数量: 1000000 | 159MB | 耗时:  9342ms, 速度: 107.04345964461571行/ms
         // [写]数量: 1000000 | 141MB | 耗时: 10438ms, 速度: 95.80379383023568行/ms
         // [写]数量: 1000000 | 119MB | 耗时:  8578ms, 速度: 116.57729074376311行/ms
+        // [写]数量: 1000000 | 115MB | 耗时:  8192ms, 速度: 122.0703125行/ms
+        // [写]数量: 1000000 | 115MB | 耗时:  8218ms, 速度: 121.68410805548795行/ms
+        // [写]数量: 1000000 | 115MB | 耗时:  7791ms, 速度: 128.3532280836863行/ms
         log.info("--> 耗时: {}ms, 速度: {}行/ms", endTime - startTime, count * 1.0 / (endTime - startTime));
         // RocksDB.destroyDB("rocksdb_03", options);
         options.close();
@@ -192,14 +200,16 @@ public class RocksdbTest {
         ReadOptions readOpts = new ReadOptions();
         RocksIterator iter = db.newIterator(readOpts);
         for (iter.seekToFirst(); iter.isValid(); iter.next()) {
-            // String key = new String(iter.key());
+            ByteBuffer readBuffer = ByteBuffer.wrap(iter.key());
+            readBuffer.order(ByteOrder.BIG_ENDIAN);
+            long key = readBuffer.getLong();
             byte[] data = iter.value();
             Input input = new Input(data);
             MyData data2 = kryo.readObject(input, MyData.class);
             input.close();
             count++;
             if (count % 10000 == 0) {
-                log.info("[读]数量: {} | {}", count, data2);
+                log.info("[读]数量: {} | {}={}", count, key, data2);
             }
         }
         log.info("[读]数量: {}", count);
@@ -222,7 +232,10 @@ public class RocksdbTest {
         final long startTime = System.currentTimeMillis();
         long count = 0;
         do {
-            byte[] data = db.get(String.valueOf(RandomUtil.randomInt(1, 99_9999)).getBytes(StandardCharsets.UTF_8));
+            ByteBuffer buffer = ByteBuffer.allocate(8);
+            buffer.order(ByteOrder.BIG_ENDIAN);
+            buffer.putLong(RandomUtil.randomLong(1, 99_9999));
+            byte[] data = db.get(buffer.array());
             MyData data2 = null;
             if (data != null) {
                 Input input = new Input(data);
@@ -233,13 +246,15 @@ public class RocksdbTest {
             if (count % 10000 == 0) {
                 log.info("[读]数量: {} | {}", count, data2);
             }
-        } while (count < 10_0000);
+        } while (count < 100_0000);
         log.info("[读]数量: {}", count);
         final long endTime = System.currentTimeMillis();
         log.info("[读]数量: {}", count);
         // [读]数量: 1000000 | 耗时: 12268ms, 速度: 81.51287903488752行/ms
         // [读]数量: 1000000 | 耗时: 11212ms, 速度: 89.19015340706386行/ms
         // [读]数量: 1000000 | 耗时: 11469ms, 速度: 87.19155985700584行/ms
+        // [读]数量: 1000000 | 耗时: 14203ms, 速度: 70.40766035344646行/ms
+        // [读]数量: 1000000 | 耗时: 13346ms, 速度: 74.9288176232579行/ms
         log.info("--> 耗时: {}ms, 速度: {}行/ms", endTime - startTime, count * 1.0 / (endTime - startTime));
         db.close();
         options.close();
