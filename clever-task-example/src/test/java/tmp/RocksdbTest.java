@@ -6,6 +6,7 @@ import com.esotericsoftware.kryo.io.Output;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.clever.core.BatchDataUtils;
+import org.clever.core.random.RandomUtil;
 import org.clever.data.jdbc.Jdbc;
 import org.junit.jupiter.api.Test;
 import org.rocksdb.*;
@@ -41,7 +42,6 @@ public class RocksdbTest {
         db.close();
         options.close();
     }
-
 
     @SneakyThrows
     @Test
@@ -208,6 +208,38 @@ public class RocksdbTest {
         // [读]数量: 1000000 | 耗时: 2924ms, 速度: 341.9972640218878行/ms
         // [读]数量: 1000000 | 耗时: 2925ms, 速度: 341.88034188034186行/ms
         // [读]数量: 1000000 | 耗时: 3155ms, 速度: 316.95721077654514行/ms
+        log.info("--> 耗时: {}ms, 速度: {}行/ms", endTime - startTime, count * 1.0 / (endTime - startTime));
+        db.close();
+        options.close();
+    }
+
+    @SneakyThrows
+    @Test
+    public void test05() {
+        Kryo kryo = KryoTest.createKryo();
+        final Options options = new Options().setCreateIfMissing(true);
+        final RocksDB db = RocksDB.open(options, "rocksdb_03");
+        final long startTime = System.currentTimeMillis();
+        long count = 0;
+        do {
+            byte[] data = db.get(String.valueOf(RandomUtil.randomInt(1, 99_9999)).getBytes(StandardCharsets.UTF_8));
+            MyData data2 = null;
+            if (data != null) {
+                Input input = new Input(data);
+                data2 = kryo.readObject(input, MyData.class);
+                input.close();
+            }
+            count++;
+            if (count % 10000 == 0) {
+                log.info("[读]数量: {} | {}", count, data2);
+            }
+        } while (count < 10_0000);
+        log.info("[读]数量: {}", count);
+        final long endTime = System.currentTimeMillis();
+        log.info("[读]数量: {}", count);
+        // [读]数量: 1000000 | 耗时: 12268ms, 速度: 81.51287903488752行/ms
+        // [读]数量: 1000000 | 耗时: 11212ms, 速度: 89.19015340706386行/ms
+        // [读]数量: 1000000 | 耗时: 11469ms, 速度: 87.19155985700584行/ms
         log.info("--> 耗时: {}ms, 速度: {}行/ms", endTime - startTime, count * 1.0 / (endTime - startTime));
         db.close();
         options.close();
