@@ -43,6 +43,13 @@ dependencies {
     // api("ch.qos.logback:logback-core:1.2.13")
     // api("ch.qos.logback:logback-classic:1.2.13")
     runtimeOnly("org.apache.doris:flink-doris-connector-1.20:25.1.0")
+
+    api("io.projectreactor:reactor-core")
+    testImplementation("io.projectreactor:reactor-core")
+
+    implementation("io.debezium:debezium-connector-postgres:3.3.2.Final")
+    implementation("io.debezium:debezium-connector-mysql:3.3.2.Final")
+    implementation("io.debezium:debezium-embedded:3.3.2.Final")
 }
 
 //configurations.all {
