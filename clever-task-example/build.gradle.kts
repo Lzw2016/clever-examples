@@ -38,6 +38,8 @@ dependencies {
     api("com.konghq:unirest-modules-jackson:4.4.12")
     api("com.starrocks:starrocks-stream-load-sdk:1.0")
 
+    api("co.elastic.clients:elasticsearch-java:8.19.10")
+
     // api("org.apache.arrow:arrow-vector:18.3.0")
     api("org.apache.flink:flink-streaming-java:2.2.0")
     api("org.apache.flink:flink-clients:2.2.0")
