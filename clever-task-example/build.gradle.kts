@@ -32,6 +32,12 @@ dependencies {
     api("net.openhft:chronicle-queue:5.27ea11")
     api("org.rocksdb:rocksdbjni:10.2.1")
 
+    api("commons-io:commons-io:2.21.0")
+    api("org.apache.commons:commons-csv:1.14.1")
+    api("com.konghq:unirest-java-core:4.4.12")
+    api("com.konghq:unirest-modules-jackson:4.4.12")
+    api("com.starrocks:starrocks-stream-load-sdk:1.0")
+
     // api("org.apache.arrow:arrow-vector:18.3.0")
     api("org.apache.flink:flink-streaming-java:2.2.0")
     api("org.apache.flink:flink-clients:2.2.0")
