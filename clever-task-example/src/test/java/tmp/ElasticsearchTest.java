@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -117,7 +116,7 @@ public class ElasticsearchTest {
 
         ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
         ElasticsearchClient client = new ElasticsearchClient(transport);
-        String dataStreamName = "api4-logs-001";
+        String dataStreamName = "api4-logs-002";
 
         Path csvFile = Paths.get("D:\\api4_logs_1000000.csv");
         FileReader reader = new FileReader(csvFile.toFile());
@@ -137,9 +136,9 @@ public class ElasticsearchTest {
             row.put("client", values[2]);
             row.put("err_msg", values[3]);
             row.put("log_id", values[4]);
-            row.put("req_data", StringUtils.truncate(values[5], 1024 * 1024 * 3));
+            row.put("req_data", values[5]);
             row.put("req_date", values[6]);
-            row.put("res_data", StringUtils.truncate(values[7], 1024 * 1024 * 3));
+            row.put("res_data", values[7]);
             row.put("res_date", values[8]);
             row.put("server", values[9]);
             row.put("status", values[10]);
