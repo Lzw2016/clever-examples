@@ -56,7 +56,6 @@ public class ElasticsearchTest {
         ElasticsearchClient client = new ElasticsearchClient(transport);
 
         // === 2. 定义数据流名称和模板 ===
-        String dataStreamName = "api4-logs";           // 实际写入名（必须匹配模板 pattern）
         String templateName = "template-api4-logs";
         String indexPattern = "api4-logs*";           // 模板匹配模式
 
@@ -92,10 +91,10 @@ public class ElasticsearchTest {
                 .dataStream(ds -> ds) // 👈 关键：启用数据流
                 .template(tmpl -> tmpl
                     .mappings(mapping)
-                    .settings(b -> b.numberOfShards("1").numberOfReplicas("0"))
+                    .settings(b -> b.numberOfShards("1").numberOfReplicas("0").index(b2->b2.mode("logsdb")))
+                    .lifecycle(b -> b.enabled(true).dataRetention(b2 -> b2.time("90d")))
                 )
         );
-
         PutIndexTemplateResponse response = client.indices().putIndexTemplate(request);
         log.info("✅ 索引模板创建成功: {}", response.acknowledged());
         // 清理
