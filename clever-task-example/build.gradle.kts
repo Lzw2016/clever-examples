@@ -40,6 +40,9 @@ dependencies {
 
     api("co.elastic.clients:elasticsearch-java:8.19.10")
 
+    api("com.github.luben:zstd-jni:1.5.7-6")
+    api("org.apache.kafka:kafka-clients:4.1.1")
+
     // api("org.apache.arrow:arrow-vector:18.3.0")
     api("org.apache.flink:flink-streaming-java:2.2.0")
     api("org.apache.flink:flink-clients:2.2.0")
