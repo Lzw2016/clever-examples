@@ -114,6 +114,7 @@ public class DorisTest {
         HttpClient client = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.ALWAYS)
             .connectTimeout(Duration.ofSeconds(10))
+            .version(HttpClient.Version.HTTP_1_1)
             .build();
         // 构建 HttpRequest
         HttpRequest request = HttpRequest.newBuilder()
@@ -204,7 +205,7 @@ public class DorisTest {
                         printer.close();
                         stringBuilder.delete(0, stringBuilder.length());
                         // printer = new CSVPrinter(stringWriter, CSVFormat.DEFAULT);
-                        //break;
+                        break;
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
                     }

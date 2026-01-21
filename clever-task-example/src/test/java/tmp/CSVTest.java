@@ -17,6 +17,7 @@ import org.clever.data.jdbc.support.SqlLoggerUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileReader;
+import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -40,7 +41,8 @@ public class CSVTest {
         Unirest.config()
             .connectTimeout(3_000)
             .requestTimeout(60_000)
-            .connectionTTL(Duration.ofMinutes(10))
+            .connectionTTL(Duration.ofSeconds(3)) // 缓解java.io.IOException: HTTP/1.1 header parser received no bytes 问题
+            .version(HttpClient.Version.HTTP_1_1)
             .httpClient(UnirestHttpClient::new)
             .retryAfter(true, 3)
             .instrumentWith(request -> {
@@ -94,30 +96,23 @@ public class CSVTest {
                 values[11]
             );
             if (count % 5000 == 0 || stringBuilder.length() >= (1024 * 1024 * 30)) {
-                for (int i = 0; i < 10; i++) {
-                    String LABEL = "test01-" + IDCreateUtils.uuid();
-                    log.info("LABEL={}", LABEL);
-                    try {
-                        HttpResponse<String> loadResp = unirest.put(BASE_URL + "/api/" + DB_NAME + "/" + tblName + "/_stream_load")
-                            .basicAuth(USERNAME, PASSWORD)
-                            .header("label", LABEL)
-                            .header("Expect", "100-continue")
-                            .header("format", "CSV")
-                            .header("column_separator", ",")
-                            .header("enclose", "\"")
-                            .header("columns", "api_name,client,err_msg,log_id,req_data,req_date,res_data,res_date,server,status,url")
-                            .body(stringBuilder.toString())
-                            .asString();
-                        log.info("[写]数量: {} -> {}", count, SqlLoggerUtils.deleteWhitespace(loadResp.getBody()));
-                        // log.info("--> \n\n{}\n\n", stringWriter.toString());
-                        printer.close();
-                        stringBuilder.delete(0, stringBuilder.length());
-                        // printer = new CSVPrinter(stringWriter, CSVFormat.DEFAULT);
-                        break;
-                    } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-                    }
-                }
+                String LABEL = "test01-" + IDCreateUtils.uuid();
+                log.info("LABEL={}", LABEL);
+                HttpResponse<String> loadResp = unirest.put(BASE_URL + "/api/" + DB_NAME + "/" + tblName + "/_stream_load")
+                    .basicAuth(USERNAME, PASSWORD)
+                    .header("label", LABEL)
+                    .header("Expect", "100-continue")
+                    .header("format", "CSV")
+                    .header("column_separator", ",")
+                    .header("enclose", "\"")
+                    .header("columns", "api_name,client,err_msg,log_id,req_data,req_date,res_data,res_date,server,status,url")
+                    .body(stringBuilder.toString())
+                    .asString();
+                log.info("[写]数量: {} -> {}", count, SqlLoggerUtils.deleteWhitespace(loadResp.getBody()));
+                // log.info("--> \n\n{}\n\n", stringWriter.toString());
+                printer.close();
+                stringBuilder.delete(0, stringBuilder.length());
+                // printer = new CSVPrinter(stringWriter, CSVFormat.DEFAULT);
             }
             // if (count >= 30) break;
         }
