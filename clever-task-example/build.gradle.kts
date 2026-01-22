@@ -32,6 +32,8 @@ dependencies {
     api("net.openhft:chronicle-queue:5.27ea11")
     api("org.rocksdb:rocksdbjni:10.2.1")
 
+    api("org.apache.avro:avro:1.12.1")
+    api("io.confluent:kafka-avro-serializer:7.9.5")
     api("commons-io:commons-io:2.21.0")
     api("org.apache.commons:commons-csv:1.14.1")
     api("com.konghq:unirest-java-core:4.4.12")

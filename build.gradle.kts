@@ -63,6 +63,7 @@ allprojects {
         mavenLocal()
         mavenCentral()
         maven(url = "https://maven.aliyun.com/repository/public/")
+        maven(url = "https://packages.confluent.io/maven/")
         maven(url = "http://all.msvc.top:30005/api/packages/clever/maven/") {
             isAllowInsecureProtocol = true
         }
