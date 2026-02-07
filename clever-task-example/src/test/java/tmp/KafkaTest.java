@@ -35,13 +35,20 @@ import java.util.*;
 @Slf4j
 public class KafkaTest {
     public static Properties getCommonProps() {
+//        String jaasConfig = "KafkaClient { "
+//            + "org.apache.kafka.common.security.plain.PlainLoginModule required "
+//            + "username=\"admin\" "
+//            + "password=\"admin123567!\"; "
+//            + "};";
+//        System.setProperty("java.security.auth.login.config", jaasConfig);
+
         Properties props = new Properties();
         props.put("bootstrap.servers", "192.168.1.201:9092");
         props.put("client.id", "kafka-client-demo");
         // 如果启用了 SASL/SSL，需额外配置
-        // props.put("security.protocol", "SASL_PLAINTEXT");
-        // props.put("sasl.mechanism", "PLAIN");
-        // props.put("sasl.jaas.config", "...");
+        props.put("security.protocol", "SASL_PLAINTEXT");
+        props.put("sasl.mechanism", "PLAIN");
+        props.put("sasl.jaas.config", "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"admin123567!\" user_admin=\"admin123567!\";");
         return props;
     }
 

@@ -47,7 +47,7 @@ public class ElasticsearchTest {
         credentialsProvider.setCredentials(AuthScope.ANY,
             new UsernamePasswordCredentials("elastic", "qZA4JRQ5MvEAzU3JNaxL"));
 
-        RestClient restClient = RestClient.builder(new HttpHost("180.100.199.56", 9200, "http"))
+        RestClient restClient = RestClient.builder(HttpHost.create("http://180.100.199.56:9200"))
             .setHttpClientConfigCallback(httpClientBuilder ->
                 httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
             .build();

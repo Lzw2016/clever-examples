@@ -74,8 +74,8 @@ allprojects {
         // resolutionStrategy.cacheChangingModulesFor(0, "seconds")
     }
 
-    java.sourceCompatibility = JavaVersion.VERSION_17
-    java.targetCompatibility = JavaVersion.VERSION_17
+    java.sourceCompatibility = JavaVersion.VERSION_21
+    java.targetCompatibility = JavaVersion.VERSION_21
 
     tasks.compileJava {
         options.encoding = "UTF-8"

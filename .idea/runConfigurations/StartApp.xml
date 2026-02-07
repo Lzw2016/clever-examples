@@ -2,7 +2,7 @@
   <configuration default="false" name="StartApp" type="Application" factoryName="Application" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="org.clever.app.StartApp" />
     <module name="clever-examples.clever-example-javalin.main" />
-    <option name="VM_PARAMETERS" value="-Xms32m -Xmx256m" />
+    <option name="VM_PARAMETERS" value="-Xms32m -Xmx256m --add-opens java.base/java.lang=ALL-UNNAMED -javaagent:D:\SourceCode\jztd\lzw\wms8-bench\my-agent\build\libs\my-agent-0.0.0-SNAPSHOT.jar" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="org.clever.app.*" />
