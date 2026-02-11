@@ -108,25 +108,69 @@ public class KafkaTest {
     @Test
     public void test03() {
         Properties props = getCommonProps();
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer-group-01");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "test01");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+        // props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        props.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, 1);
+        props.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, 100);
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 3000);
+        props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 5000);
+        props.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 50 * 1024 * 1024);
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
-        String topic = "api4-logs";
+        String topic = "tushare_stock_1dk_qfq";
         consumer.subscribe(List.of(topic));
-        for (int idx = 0; idx < 30; idx++) {
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+        int retries = 0;
+        final int maxRetries = 30;
+        while (true) {
+            consumer.poll(Duration.ofMillis(300));
+            if (!consumer.assignment().isEmpty() || retries >= maxRetries) {
+                break;
+            }
+            retries++;
+            log.info("正在等待分区分配... retry={}", retries);
+        }
+        Set<TopicPartition> assignedPartitions = consumer.assignment();
+        Map<TopicPartition, Long> endOffsets = consumer.endOffsets(assignedPartitions);
+        endOffsets.forEach((tp, endOffset) -> {
+            // 这里不会执行
+            long targetOffset = Math.max(consumer.beginningOffsets(Set.of(tp)).get(tp), endOffset - 10_0000L);
+            consumer.seek(tp, targetOffset);
+            log.info("###seek {} -> {}", tp, targetOffset);
+        });
+        log.info("开始");
+        long startTime = System.currentTimeMillis();
+        long count = 0;
+        while (true) {
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(50));
+            ConsumerRecord<String, String> offsetRecord = null;
             for (ConsumerRecord<String, String> record : records) {
-                log.info(
-                    "Received: key={}, value={}, partition={}, offset={}",
-                    record.key(), record.value(), record.partition(), record.offset()
-                );
-                TopicPartition partition = new TopicPartition(record.topic(), record.partition());
-                OffsetAndMetadata offset = new OffsetAndMetadata(record.offset() + 1);
+                offsetRecord = record;
+                count++;
+                if (count % 1_0000 == 0) {
+                    log.info(
+                        "Received: key={}, value={}, partition={}, offset={}",
+                        record.key(), record.value(), record.partition(), record.offset()
+                    );
+                    long cost = System.currentTimeMillis() - startTime;
+                    log.info("count={} | 耗时: {}ms | 速度: {}个/ms", count, cost, count / cost);
+                }
+            }
+            if (offsetRecord != null) {
+                TopicPartition partition = new TopicPartition(offsetRecord.topic(), offsetRecord.partition());
+                OffsetAndMetadata offset = new OffsetAndMetadata(offsetRecord.offset() + 1);
                 Map<TopicPartition, OffsetAndMetadata> offsetsToCommit = Collections.singletonMap(partition, offset);
-                consumer.commitSync(offsetsToCommit);
+                consumer.commitAsync(offsetsToCommit, (offsets, exception) -> {
+                });
+            }
+            long lag = 0;
+            for (TopicPartition partition : consumer.assignment()) {
+                lag += consumer.currentLag(partition).orElse(0);
+            }
+            if (lag <= 0) {
+                break;
             }
         }
         consumer.close();
