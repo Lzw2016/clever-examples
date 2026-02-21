@@ -23,7 +23,7 @@ public class ReactorTest {
             .flatMap(integer -> Mono.just(integer * 2))
             .subscribe(integer -> log.info("-> {}", integer));
         while (!disposable.isDisposed()) {
-            // noinspection BusyWait
+            //noinspection BusyWait
             Thread.sleep(100);
         }
         log.info("完成");

@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.ta4j.core.*;
-import org.ta4j.core.backtest.BarSeriesManager;
 import org.ta4j.core.bars.TimeBarBuilder;
 import org.ta4j.core.criteria.drawdown.MaximumDrawdownCriterion;
 import org.ta4j.core.criteria.pnl.GrossReturnCriterion;
@@ -77,7 +76,7 @@ public class Ta4jTest {
 
         // 3. 创建 TradingRecord 和回测管理器
         TradingRecord tradingRecord = new BaseTradingRecord();
-        BarSeriesManager manager = new BarSeriesManager(series);
+        // BarSeriesManager manager = new BarSeriesManager(series);
 
         // 4. 模拟流式数据输入（例如从文件、Kafka、数据库逐条读取）
         ZoneId zone = ZoneId.systemDefault();
@@ -99,7 +98,7 @@ public class Ta4jTest {
 
             // 执行策略判断
             int lastIndex = series.getEndIndex();
-            if (lastIndex >= longSma.getCountOfUnstableBars()) { // 等待指标稳定
+            if (longSma.isStable()) { // 等待指标稳定
                 boolean shouldEnter = strategy.shouldEnter(lastIndex, tradingRecord);
                 boolean shouldExit = strategy.shouldExit(lastIndex, tradingRecord);
 
