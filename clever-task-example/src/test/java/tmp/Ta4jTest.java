@@ -54,7 +54,6 @@ public class Ta4jTest {
         log.info("series -> {}", series);
     }
 
-
     @SneakyThrows
     @Test
     public void test02() {

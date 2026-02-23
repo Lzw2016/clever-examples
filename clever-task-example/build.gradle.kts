@@ -64,8 +64,10 @@ dependencies {
     implementation("io.debezium:debezium-connector-mysql:3.3.2.Final")
     implementation("io.debezium:debezium-embedded:3.3.2.Final")
 
-    api("org.ta4j:ta4j-core:0.22.1")
+    api("org.ta4j:ta4j-core:0.22.2")
     api("org.apache.arrow:flight-sql-jdbc-core:17.0.0")
+    // api("org.apache.arrow:flight-sql-jdbc-driver:17.0.0")
+    // api("org.apache.arrow:flight-sql-jdbc-driver:18.3.0")
 }
 
 //configurations.all {

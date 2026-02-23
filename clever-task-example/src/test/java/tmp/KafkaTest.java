@@ -35,13 +35,6 @@ import java.util.*;
 @Slf4j
 public class KafkaTest {
     public static Properties getCommonProps() {
-//        String jaasConfig = "KafkaClient { "
-//            + "org.apache.kafka.common.security.plain.PlainLoginModule required "
-//            + "username=\"admin\" "
-//            + "password=\"admin123567!\"; "
-//            + "};";
-//        System.setProperty("java.security.auth.login.config", jaasConfig);
-
         Properties props = new Properties();
         props.put("bootstrap.servers", "192.168.1.201:9092");
         props.put("client.id", "kafka-client-demo");
