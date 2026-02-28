@@ -6,9 +6,10 @@ import org.clever.core.RingBuffer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * “固定金融产品”的行情Bar时间序列数据
+ * 的行情Bar时间序列数据
  * <p>
  * 作者：lizw <br/>
  * 创建时间：2026/02/27 13:02 <br/>
@@ -21,7 +22,14 @@ public class BarSeries {
      * 存储 Bar 的环形缓冲区
      */
     private final RingBuffer<Bar> buffer;
+    /**
+     * Bar 数据监听器列表
+     */
     private final List<BarListener> listeners = new ArrayList<>();
+    /**
+     * 金融产品编码
+     */
+    private volatile String code = null;
 
     /**
      * @param slidingWindow 存储Bar的滑动窗口大小
@@ -68,7 +76,13 @@ public class BarSeries {
      * 在末尾追加一个 Bar
      */
     public void appendBar(Bar bar) {
+        Assert.notNull(bar, "参数 bar 不能为 null");
+        Assert.isNotBlank(bar.getCode(), "参数 bar.code 不能为 null");
+        Assert.isTrue(code == null || Objects.equals(code, bar.getCode()), String.format("参数 bar.code 值必须为 %s", code));
         synchronized (buffer) {
+            if (code == null) {
+                code = bar.getCode();
+            }
             long barIdx = buffer.add(bar, this::emitRemoveBarEvent);
             Assert.isTrue(barIdx >= 0, "追加 Bar 失败");
             emitAppendBarEvent(bar, barIdx);
@@ -81,7 +95,24 @@ public class BarSeries {
      */
     public void registerBarListener(BarListener listener) {
         Assert.notNull(listener, "参数 listener 不能为 null");
+        BindBarSeries bindBarSeries = null;
+        if (listener instanceof BindBarSeries) {
+            bindBarSeries = (BindBarSeries) listener;
+            BarSeries series = bindBarSeries.getBarSeries();
+            Assert.isTrue(
+                series == null || series == this,
+                String.format("当前BindBarSeries已经绑定了BarSeries, listener=%s, series=%s", bindBarSeries, series)
+            );
+        }
         synchronized (listeners) {
+            if (bindBarSeries != null) {
+                BarSeries series = bindBarSeries.getBarSeries();
+                Assert.isTrue(
+                    series == null || series == this,
+                    String.format("当前BindBarSeries已经绑定了BarSeries, listener=%s, series=%s", bindBarSeries, series)
+                );
+                bindBarSeries.bind(this);
+            }
             boolean exist = listeners.stream().anyMatch(item -> item == listener);
             if (exist) {
                 return;

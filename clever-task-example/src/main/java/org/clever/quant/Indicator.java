@@ -6,12 +6,7 @@ package org.clever.quant;
  * 作者：lizw <br/>
  * 创建时间：2026/02/27 13:22 <br/>
  */
-public interface Indicator<T> extends BarListener {
-    /**
-     * 当前指标对应的 BarSeries
-     */
-    BarSeries getBarSeries();
-
+public interface Indicator<T> extends BarListener, BindBarSeries {
     /**
      * 获取指定 Bar 索引位置的指标数据
      *
