@@ -1,5 +1,7 @@
 package org.clever.quant;
 
+import java.util.List;
+
 /**
  * 行情Bar的指标数据
  * <p>
@@ -14,6 +16,15 @@ public interface Indicator<T> extends BarListener, BindBarSeries {
      * @return 如果无法计算返回 null
      */
     T getValue(long barIdx);
+
+    /**
+     * 从指定索引位置开始向前获取指标数据
+     *
+     * @param lastBarIdx 指定索引位置
+     * @param size       向前获取的数据量
+     * @return 返回指定数据集合(数据量可能不够)
+     */
+    List<T> getValues(long lastBarIdx, int size);
 
     /**
      * 能计算当前指标需要的最小Bar数量

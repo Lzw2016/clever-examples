@@ -16,7 +16,7 @@ import java.util.Objects;
  */
 @Slf4j
 public class BarSeries {
-    private static final int MIN_SLIDING_WINDOW = 10240;
+    private static final int MIN_SLIDING_WINDOW = 8;
     private static final int DEF_SLIDING_WINDOW = 102400;
     /**
      * 存储 Bar 的环形缓冲区
@@ -63,6 +63,21 @@ public class BarSeries {
             return null;
         }
         return bars.get(0);
+    }
+
+    /**
+     * 从指定索引位置开始向前获取 Bar 数据
+     *
+     * @param lastBarIdx 指定索引位置
+     * @param size       向前获取的数据量
+     * @return 返回指定数据集合(数据量可能不够)
+     */
+    public List<Bar> getBars(long lastBarIdx, int size) {
+        Assert.isTrue(lastBarIdx > 0, "参数 lastBarIdx 必须大于等于 0");
+        Assert.isTrue(size > 0, "参数 size 必须大于等于 0");
+        final long startIndex = lastBarIdx - size + 1;
+        RingBuffer.BufferContent<Bar> content = buffer.getBuffer(startIndex, size);
+        return content.getContent();
     }
 
     /**
