@@ -1,0 +1,25 @@
+package org.clever.quant;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.util.List;
+
+/**
+ * 交易账户快照
+ * <p>
+ * 作者：lizw <br/>
+ * 创建时间：2026/02/27 17:07 <br/>
+ */
+@Builder
+@Data
+public class TradeAccountSnapshot {
+    /**
+     * 持仓状态
+     */
+    private final List<Position> positions;
+    /**
+     * 账户余额
+     */
+    private final double balance;
+}
