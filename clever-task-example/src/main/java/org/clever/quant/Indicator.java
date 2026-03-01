@@ -18,7 +18,7 @@ public interface Indicator<T> extends BarListener, OneTimeBindableBarSeries {
     T getValue(long barIdx);
 
     /**
-     * 从指定索引位置开始向前获取指标数据
+     * 从指定索引位置开始向前获取指标数据(包含{@code lastBarIdx}位置数据)
      *
      * @param lastBarIdx 指定索引位置
      * @param size       向前获取的数据量

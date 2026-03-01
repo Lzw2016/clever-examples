@@ -81,6 +81,9 @@ public abstract class AbstractIndicator<T> extends AbstractOneTimeBindableBarSer
         Assert.isTrue(lastBarIdx > 0, "参数 lastBarIdx 必须大于等于 0");
         Assert.isTrue(size > 0, "参数 size 必须大于等于 0");
         final long startIndex = lastBarIdx - size + 1;
+        if (startIndex < 0) {
+            // TODO 鲁棒性
+        }
         RingBuffer.BufferContent<T> content = cache.getBuffer(startIndex, size);
         return content.getContent();
     }

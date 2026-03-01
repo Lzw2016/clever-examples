@@ -61,7 +61,7 @@ public class BaseTest {
         Account account = new SimulationAccount(10_0000);
         barSeries.registerBarListener((bar, barIdx) -> {
             String date = DateUtils.formatToString(bar.getTime(), DateUtils.yyyy_MM_dd);
-            String price = String.format("%.3f", bar.getClose());
+            String price = String.format("%.4f", bar.getClose());
             if (strategy.shouldEnter(barIdx, account.getSnapshot())) {
                 log.info("买入 @ {} 价格: {}", date, price);
             }
@@ -84,7 +84,7 @@ public class BaseTest {
                 .build();
             barSeries.appendBar(bar);
         });
-        Thread.sleep(6_000);
+        Thread.sleep(60_000);
         log.info("完成");
     }
 }

@@ -5,7 +5,7 @@ import org.clever.core.Assert;
 import org.clever.quant.Bar;
 import org.clever.quant.Indicator;
 import org.clever.quant.indicators.AbstractIndicator;
-import org.clever.quant.indicators.helpers.SumIndicator;
+import org.clever.quant.indicators.helpers.RollingSumIndicator;
 
 /**
  * 简单移动平均线(SMA)指标
@@ -17,13 +17,13 @@ import org.clever.quant.indicators.helpers.SumIndicator;
 public class SMAIndicator extends AbstractIndicator<Double> {
     private final int barCount;
     private final Indicator<? extends Number> indicator;
-    private final SumIndicator previousSum;
+    private final RollingSumIndicator previousSum;
 
     public SMAIndicator(Indicator<? extends Number> indicator, int barCount) {
         super(indicator.getBarSeries(), barCount, false);
         Assert.isTrue(barCount > 0, "参数 barCount 必须大于0");
         this.indicator = indicator;
-        this.previousSum = new SumIndicator(indicator, barCount);
+        this.previousSum = new RollingSumIndicator(indicator, barCount);
         this.barCount = barCount;
         this.series.registerBarListener(this.previousSum);
         this.series.registerBarListener(this);

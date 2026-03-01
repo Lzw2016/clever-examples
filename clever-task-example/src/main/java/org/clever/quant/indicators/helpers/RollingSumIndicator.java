@@ -13,7 +13,7 @@ import java.util.List;
  * 作者：lizw <br/>
  * 创建时间：2026/03/01 12:17 <br/>
  */
-public class SumIndicator extends AbstractIndicator<Double> {
+public class RollingSumIndicator extends AbstractIndicator<Double> {
     private final Indicator<? extends Number> indicator;
     private final int barCount;
 
@@ -21,7 +21,7 @@ public class SumIndicator extends AbstractIndicator<Double> {
      * @param indicator 需要求和的指标对象
      * @param barCount  前n个周期内值的合
      */
-    public SumIndicator(Indicator<? extends Number> indicator, int barCount) {
+    public RollingSumIndicator(Indicator<? extends Number> indicator, int barCount) {
         super(indicator.getBarSeries(), barCount);
         Assert.isTrue(barCount > 0, "参数 barCount 必须大于0");
         this.indicator = indicator;
@@ -34,7 +34,10 @@ public class SumIndicator extends AbstractIndicator<Double> {
         Assert.notNull(value, String.format("指标%s在位置%s的值为null", indicator, barIdx));
         Double preSum = getValue(barIdx - 1);
         if (preSum != null) {
-            return preSum + value.doubleValue();
+            long overflowBarIdx = barIdx - barCount;
+            Number overflowValue = indicator.getValue(overflowBarIdx);
+            Assert.notNull(overflowValue, String.format("指标%s在位置%s的值为null", indicator, overflowBarIdx));
+            return preSum + value.doubleValue() - overflowValue.doubleValue();
         }
         List<? extends Number> values = indicator.getValues(barIdx, barCount);
         Assert.isTrue(values.size() == barCount, String.format("指标%s获取前%s个值, 只获取到了%s个", indicator, barCount, values.size()));
