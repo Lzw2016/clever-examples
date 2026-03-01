@@ -23,7 +23,7 @@ public class SumIndicator extends AbstractIndicator<Double> {
      */
     public SumIndicator(Indicator<? extends Number> indicator, int barCount) {
         super(indicator.getBarSeries(), barCount);
-        Assert.isTrue(barCount > 1, "参数 barCount 必须大于1");
+        Assert.isTrue(barCount > 0, "参数 barCount 必须大于0");
         this.indicator = indicator;
         this.barCount = barCount;
     }
