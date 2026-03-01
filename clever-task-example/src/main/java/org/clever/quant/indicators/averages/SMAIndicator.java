@@ -25,8 +25,8 @@ public class SMAIndicator extends AbstractIndicator<Double> {
         this.indicator = indicator;
         this.previousSum = new SumIndicator(indicator, barCount);
         this.barCount = barCount;
-        indicator.getBarSeries().registerBarListener(this.previousSum);
-        indicator.getBarSeries().registerBarListener(this);
+        this.series.registerBarListener(this.previousSum);
+        this.series.registerBarListener(this);
     }
 
     @Override

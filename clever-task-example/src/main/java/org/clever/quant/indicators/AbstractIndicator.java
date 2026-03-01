@@ -57,6 +57,9 @@ public abstract class AbstractIndicator<T> extends AbstractOneTimeBindableBarSer
      * @return 不存在返回 null
      */
     protected T getValueFromCache(long barIdx) {
+        if (barIdx < 0) {
+            return null;
+        }
         RingBuffer.BufferContent<T> content = cache.getBuffer(barIdx, 1);
         List<T> list = content.getContent();
         if (list.isEmpty()) {

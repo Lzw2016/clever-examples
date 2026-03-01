@@ -38,6 +38,7 @@ public class BaseDataSource {
         sql.append("where suspendFlag=0 ");
         sql.append(String.format("and stock_code='%s' ", stockCode));
         sql.append("order by time asc ");
+        sql.append("limit 100");
         try (Jdbc jdbc = createDorisJdbc()) {
             jdbc.queryForCursor(
                 sql.toString(),
