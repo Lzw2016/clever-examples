@@ -75,11 +75,18 @@ public abstract class AbstractIndicator<T> extends AbstractBindBarSeries impleme
 
     @Override
     public void onAppendBar(Bar bar, long barIdx) {
-        T value = null;
+        T value = getDefValue();
         if (isStable()) {
             value = calculate(bar, barIdx);
         }
         cache.add(value);
+    }
+
+    /**
+     * 当指标值未稳定之前(Bar数量不满足最小计算数量)的默认值
+     */
+    protected T getDefValue() {
+        return null;
     }
 
     /**

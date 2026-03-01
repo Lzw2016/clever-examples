@@ -3,6 +3,7 @@ package quant;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.clever.quant.*;
+import org.clever.quant.indicators.averages.SMAIndicator;
 import org.clever.quant.indicators.helpers.ClosePriceIndicator;
 import org.junit.jupiter.api.Test;
 import ta4j.BaseDataSource;
@@ -45,7 +46,10 @@ public class BaseTest {
     @Test
     public void t02() {
         BarSeries barSeries = new BarSeries();
-        ClosePriceIndicator closePriceIndicator = new ClosePriceIndicator(barSeries);
+        ClosePriceIndicator closePrice = new ClosePriceIndicator(barSeries);
+        SMAIndicator sma10 = new SMAIndicator(closePrice, 10);
+        SMAIndicator sma30 = new SMAIndicator(closePrice, 30);
+
         String stockCode = "600998.SH";
         BaseDataSource.get1dkBar(stockCode, stockBarData -> {
             Bar bar = Bar.builder()
@@ -62,6 +66,6 @@ public class BaseTest {
             barSeries.appendBar(bar);
         });
         Thread.sleep(60_000);
-        log.info("-> {}", closePriceIndicator);
+        log.info("完成");
     }
 }
