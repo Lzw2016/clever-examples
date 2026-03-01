@@ -26,7 +26,7 @@ public abstract class AbstractIndicator<T> extends AbstractBindBarSeries impleme
      */
     protected final RingBuffer<T> cache;
 
-    protected AbstractIndicator(BarSeries series, int unstableBarCount) {
+    public AbstractIndicator(BarSeries series, int unstableBarCount) {
         Assert.notNull(series, "参数 series 不能为 null");
         Assert.isTrue(unstableBarCount >= 0, "参数 unstableBarCount 必须大于等于0");
         series.registerBarListener(this);

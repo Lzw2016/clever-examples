@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 行情Bar数据
@@ -23,13 +25,9 @@ public class Bar {
      */
     private final Period period;
     /**
-     * 开始时间(不包含)
+     * 时间
      */
-    private final Date beginTime;
-    /**
-     * 结束时间(包含)
-     */
-    private final Date endTime;
+    private final Date time;
     /**
      * 开盘价
      */
@@ -54,4 +52,8 @@ public class Bar {
      * 成交额
      */
     private double amount;
+    /**
+     * 其它扩展数据
+     */
+    private final Map<String, Object> extData = new HashMap<>();
 }

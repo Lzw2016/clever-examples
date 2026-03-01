@@ -1,8 +1,11 @@
 package quant;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.clever.quant.*;
+import org.clever.quant.indicators.helpers.ClosePriceIndicator;
 import org.junit.jupiter.api.Test;
+import ta4j.BaseDataSource;
 
 /**
  * 作者：lizw <br/>
@@ -36,5 +39,29 @@ public class BaseTest {
         for (int i = 0; i < 100; i++) {
             barSeries.appendBar(null);
         }
+    }
+
+    @SneakyThrows
+    @Test
+    public void t02() {
+        BarSeries barSeries = new BarSeries();
+        ClosePriceIndicator closePriceIndicator = new ClosePriceIndicator(barSeries);
+        String stockCode = "600998.SH";
+        BaseDataSource.get1dkBar(stockCode, stockBarData -> {
+            Bar bar = Bar.builder()
+                .code(stockCode)
+                .period(Period._1d)
+                .time(stockBarData.getTime())
+                .open(stockBarData.getOpen().doubleValue())
+                .high(stockBarData.getHigh().doubleValue())
+                .low(stockBarData.getLow().doubleValue())
+                .close(stockBarData.getClose().doubleValue())
+                .volume(stockBarData.getVolume())
+                .amount(stockBarData.getAmount().doubleValue())
+                .build();
+            barSeries.appendBar(bar);
+        });
+        Thread.sleep(60_000);
+        log.info("-> {}", closePriceIndicator);
     }
 }

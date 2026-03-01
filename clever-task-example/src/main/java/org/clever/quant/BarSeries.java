@@ -17,7 +17,7 @@ import java.util.Objects;
 @Slf4j
 public class BarSeries {
     private static final int MIN_SLIDING_WINDOW = 8;
-    private static final int DEF_SLIDING_WINDOW = 102400;
+    private static final int DEF_SLIDING_WINDOW = 5120;
     /**
      * 存储 Bar 的环形缓冲区
      */
