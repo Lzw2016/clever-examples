@@ -2,7 +2,7 @@ package org.clever.quant.indicators;
 
 import org.clever.core.Assert;
 import org.clever.core.RingBuffer;
-import org.clever.quant.AbstractBindBarSeries;
+import org.clever.quant.AbstractOneTimeBindableBarSeries;
 import org.clever.quant.Bar;
 import org.clever.quant.BarSeries;
 import org.clever.quant.Indicator;
@@ -15,7 +15,7 @@ import java.util.List;
  * 作者：lizw <br/>
  * 创建时间：2026/02/27 13:52 <br/>
  */
-public abstract class AbstractIndicator<T> extends AbstractBindBarSeries implements Indicator<T> {
+public abstract class AbstractIndicator<T> extends AbstractOneTimeBindableBarSeries implements Indicator<T> {
     protected final Logger log = LoggerFactory.getLogger(getClass());
     /**
      * 计算指标需要的最少 Bar 数据数量
@@ -26,14 +26,28 @@ public abstract class AbstractIndicator<T> extends AbstractBindBarSeries impleme
      */
     protected final RingBuffer<T> cache;
 
+    /**
+     * @param series           指标绑定的 BarSeries
+     * @param unstableBarCount 计算指标需要的最少 Bar 数据数量
+     */
     public AbstractIndicator(BarSeries series, int unstableBarCount) {
+        this(series, unstableBarCount, true);
+    }
+
+    /**
+     * @param series           指标绑定的 BarSeries
+     * @param unstableBarCount 计算指标需要的最少 Bar 数据数量
+     * @param autoRegister     是否自动注册 BarSeries 监听
+     */
+    public AbstractIndicator(BarSeries series, int unstableBarCount, boolean autoRegister) {
         Assert.notNull(series, "参数 series 不能为 null");
         Assert.isTrue(unstableBarCount >= 0, "参数 unstableBarCount 必须大于等于0");
-        series.registerBarListener(this);
         this.series = series;
         this.unstableBarCount = unstableBarCount;
         this.cache = new RingBuffer<>(series.getSlidingWindow());
-        this.series.registerBarListener(this);
+        if (autoRegister) {
+            this.series.registerBarListener(this);
+        }
     }
 
     /**
@@ -54,7 +68,7 @@ public abstract class AbstractIndicator<T> extends AbstractBindBarSeries impleme
     @Override
     public T getValue(long barIdx) {
         if (!isStable()) {
-            return null;
+            return getDefValue();
         }
         return getValueFromCache(barIdx);
     }

@@ -29,6 +29,7 @@ public interface Strategy {
      * @param accountSnapshot 交易账户快照
      */
     default boolean shouldEnter(long barIdx, TradeAccountSnapshot accountSnapshot) {
+        // Assert.notNull(accountSnapshot, "参数 accountSnapshot 不能为 null");
         return getEntryRule().isSatisfied(barIdx, accountSnapshot);
     }
 
@@ -39,6 +40,7 @@ public interface Strategy {
      * @param accountSnapshot 交易账户快照
      */
     default boolean shouldExit(long barIdx, TradeAccountSnapshot accountSnapshot) {
+        // Assert.notNull(accountSnapshot, "参数 accountSnapshot 不能为 null");
         return getExitRule().isSatisfied(barIdx, accountSnapshot);
     }
 

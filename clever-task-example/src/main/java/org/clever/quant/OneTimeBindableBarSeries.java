@@ -9,7 +9,7 @@ package org.clever.quant;
  * 作者：lizw <br/>
  * 创建时间：2026/02/28 11:51 <br/>
  */
-public interface BindBarSeries {
+public interface OneTimeBindableBarSeries {
     /**
      * 绑定 BarListener 对象(只能绑定一次)
      */

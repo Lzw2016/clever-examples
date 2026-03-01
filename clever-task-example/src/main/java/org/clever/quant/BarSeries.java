@@ -110,9 +110,9 @@ public class BarSeries {
      */
     public void registerBarListener(BarListener listener) {
         Assert.notNull(listener, "参数 listener 不能为 null");
-        BindBarSeries bindBarSeries = null;
-        if (listener instanceof BindBarSeries) {
-            bindBarSeries = (BindBarSeries) listener;
+        OneTimeBindableBarSeries bindBarSeries = null;
+        if (listener instanceof OneTimeBindableBarSeries) {
+            bindBarSeries = (OneTimeBindableBarSeries) listener;
             BarSeries series = bindBarSeries.getBarSeries();
             Assert.isTrue(
                 series == null || series == this,
@@ -141,11 +141,12 @@ public class BarSeries {
      */
     protected void emitAppendBarEvent(Bar bar, long barIdx) {
         for (BarListener listener : listeners) {
-            try {
-                listener.onAppendBar(bar, barIdx);
-            } catch (Exception err) {
-                log.error("onAppendBar事件回调异常, listener={}", listener, err);
-            }
+            listener.onAppendBar(bar, barIdx);
+//            try {
+//                listener.onAppendBar(bar, barIdx);
+//            } catch (Exception err) {
+//                log.error("onAppendBar事件回调异常, listener={}", listener, err);
+//            }
         }
     }
 

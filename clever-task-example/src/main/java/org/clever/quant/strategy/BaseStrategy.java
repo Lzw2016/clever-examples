@@ -18,11 +18,11 @@ public class BaseStrategy implements Strategy {
     protected final Rule entryRule;
     protected final Rule exitRule;
 
-    protected BaseStrategy(Rule entryRule, Rule exitRule) {
+    public BaseStrategy(Rule entryRule, Rule exitRule) {
         this(entryRule, exitRule, null);
     }
 
-    protected BaseStrategy(Rule entryRule, Rule exitRule, String name) {
+    public BaseStrategy(Rule entryRule, Rule exitRule, String name) {
         Assert.notNull(entryRule, "参数 entryRule 不能为 null");
         Assert.notNull(exitRule, "参数 exitRule 不能为 null");
         this.name = name == null ? getClass().getSimpleName() : name;

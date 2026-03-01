@@ -20,11 +20,13 @@ public class SMAIndicator extends AbstractIndicator<Double> {
     private final SumIndicator previousSum;
 
     public SMAIndicator(Indicator<? extends Number> indicator, int barCount) {
-        super(indicator.getBarSeries(), barCount);
+        super(indicator.getBarSeries(), barCount, false);
         Assert.isTrue(barCount > 0, "参数 barCount 必须大于0");
         this.indicator = indicator;
         this.previousSum = new SumIndicator(indicator, barCount);
         this.barCount = barCount;
+        indicator.getBarSeries().registerBarListener(this.previousSum);
+        indicator.getBarSeries().registerBarListener(this);
     }
 
     @Override

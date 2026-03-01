@@ -27,6 +27,12 @@ public class CrossIndicator extends AbstractIndicator<Boolean> {
      */
     private final Indicator<? extends Number> low;
 
+    /**
+     * 指标为true:  up下穿low之时(barIdx之前up >= low, barIdx时up < low)
+     *
+     * @param up  up指标
+     * @param low low指标
+     */
     public CrossIndicator(Indicator<? extends Number> up, Indicator<? extends Number> low) {
         super(up.getBarSeries(), Math.max(up.getUnstableBarCount(), low.getUnstableBarCount()));
         Assert.isTrue(up.getBarSeries() == low.getBarSeries(), String.format("指标up=%s与指标low=%s关联的BarSeries不一致", up, low));

@@ -8,7 +8,7 @@ import java.util.List;
  * 作者：lizw <br/>
  * 创建时间：2026/02/27 13:22 <br/>
  */
-public interface Indicator<T> extends BarListener, BindBarSeries {
+public interface Indicator<T> extends BarListener, OneTimeBindableBarSeries {
     /**
      * 获取指定 Bar 索引位置的指标数据
      *

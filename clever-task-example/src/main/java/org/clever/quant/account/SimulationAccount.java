@@ -11,6 +11,13 @@ import org.clever.quant.TradeLog;
 public class SimulationAccount extends AbstractAccount {
     /**
      * @param totalAmount 初始总金额
+     */
+    public SimulationAccount(double totalAmount) {
+        this(totalAmount, null);
+    }
+
+    /**
+     * @param totalAmount 初始总金额
      * @param name        账户名
      */
     public SimulationAccount(double totalAmount, String name) {

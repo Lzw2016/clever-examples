@@ -6,7 +6,7 @@ import org.clever.core.Assert;
  * 作者：lizw <br/>
  * 创建时间：2026/02/28 13:11 <br/>
  */
-public abstract class AbstractBindBarSeries implements BindBarSeries {
+public abstract class AbstractOneTimeBindableBarSeries implements OneTimeBindableBarSeries {
     /**
      * 当前绑定的 BarSeries
      */
