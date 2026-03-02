@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.clever.core.DateUtils;
 import org.clever.quant.*;
 import org.clever.quant.account.SimulationAccount;
+import org.clever.quant.fee.StockTradeFeeStrategy;
 import org.clever.quant.indicators.averages.SMAIndicator;
 import org.clever.quant.indicators.helpers.ClosePriceIndicator;
 import org.clever.quant.rules.CrossedDownIndicatorRule;
@@ -104,7 +105,7 @@ public class BaseTest {
             .account(account)
             .strategy(strategy)
             .positionStrategy(null)
-            .tradeFeeStrategy(null)
+            .tradeFeeStrategy(new StockTradeFeeStrategy())
             .build();
         trader.start(barSeries);
         String stockCode = "600998.SH";
