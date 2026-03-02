@@ -141,12 +141,12 @@ public class BarSeries {
      */
     protected void emitAppendBarEvent(Bar bar, long barIdx) {
         for (BarListener listener : listeners) {
-            listener.onAppendBar(bar, barIdx);
-//            try {
-//                listener.onAppendBar(bar, barIdx);
-//            } catch (Exception err) {
-//                log.error("onAppendBar事件回调异常, listener={}", listener, err);
-//            }
+            try {
+                listener.onAppendBar(bar, barIdx);
+            } catch (Exception err) {
+                log.error("onAppendBar事件回调异常, listener={}", listener, err);
+                System.exit(-1);
+            }
         }
     }
 
@@ -159,6 +159,7 @@ public class BarSeries {
                 listener.onRemoveBar(bar, barIdx);
             } catch (Exception err) {
                 log.error("onRemoveBar事件回调异常, listener={}", listener, err);
+                System.exit(-1);
             }
         }
     }

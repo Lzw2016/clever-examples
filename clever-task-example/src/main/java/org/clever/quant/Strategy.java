@@ -13,17 +13,17 @@ public interface Strategy {
     String getName();
 
     /**
-     * 买入规则(做多)
+     * 开仓规则
      */
     Rule getEntryRule();
 
     /**
-     * 卖出规则(做空)
+     * 平仓规则
      */
     Rule getExitRule();
 
     /**
-     * 当前barIdx位置是否应该买入(做多)
+     * 当前barIdx位置是否应该开仓
      *
      * @param barIdx          Bar的索引位置
      * @param accountSnapshot 交易账户快照
@@ -34,7 +34,7 @@ public interface Strategy {
     }
 
     /**
-     * 当前barIdx位置是否应该卖出(做空)
+     * 当前barIdx位置是否应该平仓
      *
      * @param barIdx          Bar的索引位置
      * @param accountSnapshot 交易账户快照

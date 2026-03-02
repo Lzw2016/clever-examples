@@ -8,7 +8,7 @@ package org.clever.quant;
  */
 public interface TradeFeeStrategy {
     /**
-     * 计算买入(做多)手续费
+     * 计算开仓手续费
      *
      * @param price  撮合成交价
      * @param volume 成交量
@@ -16,7 +16,7 @@ public interface TradeFeeStrategy {
     double calcEnterFee(double price, long volume);
 
     /**
-     * 计算卖出(做空)手续费
+     * 计算平仓手续费
      *
      * @param price  撮合成交价
      * @param volume 成交量

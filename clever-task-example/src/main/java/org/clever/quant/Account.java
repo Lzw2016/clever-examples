@@ -10,6 +10,11 @@ import java.util.List;
  */
 public interface Account {
     /**
+     * 初始总金额
+     */
+    double getTotalAmount();
+
+    /**
      * 账户余额
      */
     double getBalance();
@@ -25,7 +30,7 @@ public interface Account {
     TradeAccountSnapshot getSnapshot();
 
     /**
-     * 买入(做多)
+     * 开仓
      *
      * @param barIdx Bar的索引位置
      * @param price  撮合成交价
@@ -33,10 +38,10 @@ public interface Account {
      * @param fee    手续费(交易成本)
      * @return 如果没有交易就返回 null
      */
-    TradeLog enter(int barIdx, double price, long volume, double fee);
+    TradeLog enter(long barIdx, double price, long volume, double fee);
 
     /**
-     * 卖出(做空)
+     * 平仓
      *
      * @param barIdx Bar的索引位置
      * @param price  撮合成交价
@@ -44,5 +49,5 @@ public interface Account {
      * @param fee    手续费(交易成本)
      * @return 如果没有交易就返回 null
      */
-    TradeLog exit(int barIdx, double price, long volume, double fee);
+    TradeLog exit(long barIdx, double price, long volume, double fee);
 }

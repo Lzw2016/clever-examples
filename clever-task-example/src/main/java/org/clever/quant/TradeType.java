@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * 交易类型(做多/做空)
+ * 交易类型(开仓/平仓)
  * <p>
  * 作者：lizw <br/>
  * 创建时间：2026/02/27 14:57 <br/>
@@ -13,11 +13,11 @@ import lombok.ToString;
 @Getter
 public enum TradeType {
     /**
-     * 买入(做多)
+     * 开仓
      */
     BUY("buy"),
     /**
-     * 卖出(做空)
+     * 平仓
      */
     SELL("sell"),
     ;

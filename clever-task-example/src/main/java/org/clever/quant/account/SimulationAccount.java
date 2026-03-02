@@ -25,13 +25,12 @@ public class SimulationAccount extends AbstractAccount {
     }
 
     @Override
-    public TradeLog enter(int barIdx, double price, long volume, double fee) {
+    public TradeLog enter(long barIdx, double price, long volume, double fee) {
         return null;
     }
 
     @Override
-    public TradeLog exit(int barIdx, double price, long volume, double fee) {
+    public TradeLog exit(long barIdx, double price, long volume, double fee) {
         return null;
     }
 }
-

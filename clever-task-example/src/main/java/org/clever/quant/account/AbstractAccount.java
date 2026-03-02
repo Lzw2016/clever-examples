@@ -30,12 +30,16 @@ public abstract class AbstractAccount implements Account {
     /**
      * 持仓状态
      */
-    private final List<Position> positions = new ArrayList<>();
+    protected final List<Position> positions = new ArrayList<>();
     /**
      * 所有的历史交易日志
      */
     protected final List<TradeLog> tradeLogs = new ArrayList<>();
 
+    /**
+     * @param totalAmount 初始总金额
+     * @param name        账户名
+     */
     public AbstractAccount(double totalAmount, String name) {
         Assert.isTrue(totalAmount > 0, "参数 totalAmount 必须大于等于0");
         this.name = name == null ? getClass().getSimpleName() : name;

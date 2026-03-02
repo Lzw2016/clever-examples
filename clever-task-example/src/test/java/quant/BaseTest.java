@@ -47,7 +47,6 @@ public class BaseTest {
         }
     }
 
-    @SuppressWarnings("ExtractMethodRecommender")
     @SneakyThrows
     @Test
     public void t02() {
@@ -59,14 +58,18 @@ public class BaseTest {
         Rule exitRule = new CrossedDownIndicatorRule(sma30, sma10);
         Strategy strategy = new BaseStrategy(entryRule, exitRule, "均线相交策略");
         Account account = new SimulationAccount(10_0000);
+
+
         barSeries.registerBarListener((bar, barIdx) -> {
             String date = DateUtils.formatToString(bar.getTime(), DateUtils.yyyy_MM_dd);
             String price = String.format("%.4f", bar.getClose());
             if (strategy.shouldEnter(barIdx, account.getSnapshot())) {
                 log.info("买入 @ {} 价格: {}", date, price);
+                account.enter(barIdx, bar.getClose(), 1000, 5);
             }
             if (strategy.shouldExit(barIdx, account.getSnapshot())) {
                 log.info("卖出 @ {} 价格: {}", date, price);
+                account.exit(barIdx, bar.getClose(), 1000, 5);
             }
         });
         String stockCode = "600998.SH";

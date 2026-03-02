@@ -8,7 +8,7 @@ package org.clever.quant;
  */
 public interface PositionStrategy {
     /**
-     * 买入(做多)
+     * 开仓
      *
      * @param tradeAccount 交易账户
      * @param barIdx       Bar的索引位置
@@ -18,7 +18,7 @@ public interface PositionStrategy {
     TradeLog enter(Account tradeAccount, int barIdx, double price);
 
     /**
-     * 卖出(做空)
+     * 平仓
      *
      * @param tradeAccount 交易账户
      * @param barIdx       Bar的索引位置
