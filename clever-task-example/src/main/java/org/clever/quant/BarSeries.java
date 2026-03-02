@@ -28,10 +28,6 @@ public class BarSeries {
      */
     private final List<BarListener> listeners = new ArrayList<>();
     /**
-     * 金融产品编码
-     */
-    private volatile String code = null;
-    /**
      * 最后一个 Bar
      */
     private volatile Bar lastBar = null;
@@ -53,6 +49,16 @@ public class BarSeries {
      */
     public int getSlidingWindow() {
         return buffer.getBufferSize();
+    }
+
+    /**
+     * BarSeries 对应的金融产品编码
+     */
+    public String getCode() {
+        if (lastBar == null) {
+            return null;
+        }
+        return lastBar.getCode();
     }
 
     /**
@@ -98,22 +104,27 @@ public class BarSeries {
     public void appendBar(Bar bar) {
         Assert.notNull(bar, "参数 bar 不能为 null");
         Assert.isNotBlank(bar.getCode(), "参数 bar.code 不能为 null");
-        Assert.isTrue(code == null || Objects.equals(code, bar.getCode()), String.format("参数 bar.code 值必须为 %s", code));
+        Assert.isTrue(
+            lastBar == null || Objects.equals(lastBar.getCode(), bar.getCode()),
+            () -> String.format("参数 bar.code 值必须为 %s", lastBar.getCode())
+        );
+        Assert.isTrue(
+            lastBar == null || Objects.equals(lastBar.getPeriod(), bar.getPeriod()),
+            () -> String.format("参数 bar.period 值必须为 %s", lastBar.getPeriod())
+        );
         synchronized (buffer) {
-            if (code == null) {
-                code = bar.getCode();
-            }
             if (lastBar == null) {
                 lastBar = bar;
             } else {
-                Assert.isTrue(bar.getTime().compareTo(lastBar.getTime()) >= 0, String.format("bar的时间只能在%s之后", DateUtils.formatToString(lastBar.getTime())));
-                Assert.isTrue(Objects.equals(bar.getPeriod(), lastBar.getPeriod()), String.format("bar的周期只能是: %s", lastBar.getPeriod().getName()));
+                Assert.isTrue(
+                    bar.getTime().compareTo(lastBar.getTime()) >= 0,
+                    () -> String.format("bar的时间只能在%s之后", DateUtils.formatToString(lastBar.getTime()))
+                );
             }
             long barIdx = buffer.add(bar, this::emitRemoveBarEvent);
             Assert.isTrue(barIdx >= 0, "追加 Bar 失败");
             lastBar = bar;
             emitAppendBarEvent(bar, barIdx);
-            // TODO ???
         }
     }
 

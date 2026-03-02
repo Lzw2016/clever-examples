@@ -90,4 +90,40 @@ public class BaseTest {
         Thread.sleep(60_000);
         log.info("完成");
     }
+
+    @SneakyThrows
+    @Test
+    public void t03() {
+        BarSeries barSeries = new BarSeries();
+        ClosePriceIndicator closePrice = new ClosePriceIndicator(barSeries);
+        SMAIndicator sma10 = new SMAIndicator(closePrice, 10);
+        SMAIndicator sma30 = new SMAIndicator(closePrice, 30);
+        Rule entryRule = new CrossedUpIndicatorRule(sma30, sma10);
+        Rule exitRule = new CrossedDownIndicatorRule(sma30, sma10);
+        Strategy strategy = new BaseStrategy(entryRule, exitRule, "均线相交策略");
+        Account account = new SimulationAccount(10_0000);
+        Trader trader = Trader.builder()
+            .account(account)
+            .strategy(strategy)
+            .positionStrategy(null)
+            .tradeFeeStrategy(null)
+            .build();
+        trader.start(barSeries);
+        String stockCode = "600998.SH";
+        BaseDataSource.get1dkBar(stockCode, stockBarData -> {
+            Bar bar = Bar.builder()
+                .code(stockCode)
+                .period(Period._1d)
+                .time(stockBarData.getTime())
+                .open(stockBarData.getOpen().doubleValue())
+                .high(stockBarData.getHigh().doubleValue())
+                .low(stockBarData.getLow().doubleValue())
+                .close(stockBarData.getClose().doubleValue())
+                .volume(stockBarData.getVolume())
+                .amount(stockBarData.getAmount().doubleValue())
+                .build();
+            barSeries.appendBar(bar);
+        });
+        log.info("完成");
+    }
 }

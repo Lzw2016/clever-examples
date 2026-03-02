@@ -58,6 +58,6 @@ public abstract class AbstractAccount implements Account {
 
     @Override
     public TradeAccountSnapshot getSnapshot() {
-        return null;
+        return TradeAccountSnapshot.builder().build();
     }
 }
