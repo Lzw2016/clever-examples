@@ -77,16 +77,20 @@ public class BarSeries {
     }
 
     /**
-     * 从指定索引位置开始向前获取 Bar 数据
+     * 从指定索引位置开始向前获取 Bar 数据(包含{@code lastBarIdx}位置数据)
      *
      * @param lastBarIdx 指定索引位置
      * @param size       向前获取的数据量
      * @return 返回指定数据集合(数据量可能不够)
      */
     public List<Bar> getBars(long lastBarIdx, int size) {
-        Assert.isTrue(lastBarIdx > 0, "参数 lastBarIdx 必须大于等于 0");
+        Assert.isTrue(lastBarIdx >= 0, "参数 lastBarIdx 必须大于等于 0");
         Assert.isTrue(size > 0, "参数 size 必须大于等于 0");
-        final long startIndex = lastBarIdx - size + 1;
+        long startIndex = lastBarIdx - size + 1;
+        if (startIndex < 0) {
+            startIndex = 0;
+            size = (int) (lastBarIdx + 1);
+        }
         RingBuffer.BufferContent<Bar> content = buffer.getBuffer(startIndex, size);
         return content.getContent();
     }

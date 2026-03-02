@@ -135,6 +135,7 @@ public class Trader {
         }
 
         protected void doTrading(final Bar mainBar, final long barIdx) {
+            // TODO 细化
             String date = DateUtils.formatToString(mainBar.getTime(), DateUtils.yyyy_MM_dd);
             String price = String.format("%.4f", mainBar.getClose());
             if (trader.strategy.shouldEnter(lastBarIdx, trader.account.getSnapshot())) {

@@ -78,11 +78,12 @@ public abstract class AbstractIndicator<T> extends AbstractOneTimeBindableBarSer
 
     @Override
     public List<T> getValues(long lastBarIdx, int size) {
-        Assert.isTrue(lastBarIdx > 0, "参数 lastBarIdx 必须大于等于 0");
+        Assert.isTrue(lastBarIdx >= 0, "参数 lastBarIdx 必须大于等于 0");
         Assert.isTrue(size > 0, "参数 size 必须大于等于 0");
-        final long startIndex = lastBarIdx - size + 1;
+        long startIndex = lastBarIdx - size + 1;
         if (startIndex < 0) {
-            // TODO 鲁棒性
+            startIndex = 0;
+            size = (int) (lastBarIdx + 1);
         }
         RingBuffer.BufferContent<T> content = cache.getBuffer(startIndex, size);
         return content.getContent();
