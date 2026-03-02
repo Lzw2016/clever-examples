@@ -145,7 +145,7 @@ public class BarSeries {
                 listener.onAppendBar(bar, barIdx);
             } catch (Exception err) {
                 log.error("onAppendBar事件回调异常, listener={}", listener, err);
-                System.exit(-1);
+                // System.exit(-1);
             }
         }
     }
@@ -159,7 +159,7 @@ public class BarSeries {
                 listener.onRemoveBar(bar, barIdx);
             } catch (Exception err) {
                 log.error("onRemoveBar事件回调异常, listener={}", listener, err);
-                System.exit(-1);
+                // System.exit(-1);
             }
         }
     }
