@@ -1,5 +1,10 @@
 package org.clever.quant;
 
+import org.springframework.util.Assert;
+
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * 交易策略，计算买卖点
  * <p>
@@ -11,6 +16,20 @@ public interface Strategy {
      * 策略名称
      */
     String getName();
+
+    /**
+     * 返回与当前策略相关的所有 BarSeries 对象
+     */
+    default Set<BarSeries> getAllBarSeries() {
+        Rule entryRule = getEntryRule();
+        Assert.notNull(entryRule, "entryRule 不能为 null");
+        Rule exitRule = getExitRule();
+        Assert.notNull(exitRule, "exitRule 不能为 null");
+        Set<BarSeries> allBarSeries = new HashSet<>();
+        allBarSeries.addAll(entryRule.getAllBarSeries());
+        allBarSeries.addAll(exitRule.getAllBarSeries());
+        return allBarSeries;
+    }
 
     /**
      * 开仓规则
@@ -29,8 +48,10 @@ public interface Strategy {
      * @param accountSnapshot 交易账户快照
      */
     default boolean shouldEnter(long barIdx, TradeAccountSnapshot accountSnapshot) {
-        // Assert.notNull(accountSnapshot, "参数 accountSnapshot 不能为 null");
-        return getEntryRule().isSatisfied(barIdx, accountSnapshot);
+        Assert.notNull(accountSnapshot, "参数 accountSnapshot 不能为 null");
+        Rule entryRule = getEntryRule();
+        Assert.notNull(entryRule, "entryRule 不能为 null");
+        return entryRule.isSatisfied(barIdx, accountSnapshot);
     }
 
     /**
@@ -40,8 +61,10 @@ public interface Strategy {
      * @param accountSnapshot 交易账户快照
      */
     default boolean shouldExit(long barIdx, TradeAccountSnapshot accountSnapshot) {
-        // Assert.notNull(accountSnapshot, "参数 accountSnapshot 不能为 null");
-        return getExitRule().isSatisfied(barIdx, accountSnapshot);
+        Assert.notNull(accountSnapshot, "参数 accountSnapshot 不能为 null");
+        Rule exitRule = getExitRule();
+        Assert.notNull(exitRule, "exitRule 不能为 null");
+        return exitRule.isSatisfied(barIdx, accountSnapshot);
     }
 
     Strategy and(Strategy strategy, String name);

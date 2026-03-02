@@ -21,6 +21,7 @@ public class NotRule extends AbstractRule {
         super(name == null ? String.format("not %s", rule.getName()) : name);
         Assert.notNull(rule, "参数 rule 不能为 null");
         this.rule = rule;
+        addBarSeries(rule);
     }
 
     @Override

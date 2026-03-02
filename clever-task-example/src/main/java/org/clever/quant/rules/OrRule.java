@@ -24,6 +24,7 @@ public class OrRule extends AbstractRule {
         Assert.notNull(rule2, "参数 rule2 不能为 null");
         this.rule1 = rule1;
         this.rule2 = rule2;
+        addBarSeries(rule1, rule2);
     }
 
     @Override

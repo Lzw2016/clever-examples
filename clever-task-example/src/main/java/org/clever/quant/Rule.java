@@ -4,6 +4,8 @@ import org.clever.quant.rules.AndRule;
 import org.clever.quant.rules.NotRule;
 import org.clever.quant.rules.OrRule;
 
+import java.util.Set;
+
 /**
  * 交易规则
  * <p>
@@ -15,6 +17,11 @@ public interface Rule {
      * 规则名称
      */
     String getName();
+
+    /**
+     * 返回与当前规则相关的所有 BarSeries 对象
+     */
+    Set<BarSeries> getAllBarSeries();
 
     /**
      * 是否满足当前规则

@@ -2,6 +2,7 @@ package org.clever.quant;
 
 import lombok.extern.slf4j.Slf4j;
 import org.clever.core.Assert;
+import org.clever.core.DateUtils;
 import org.clever.core.RingBuffer;
 
 import java.util.ArrayList;
@@ -30,6 +31,10 @@ public class BarSeries {
      * 金融产品编码
      */
     private volatile String code = null;
+    /**
+     * 最后一个 Bar
+     */
+    private volatile Bar lastBar = null;
 
     /**
      * @param slidingWindow 存储Bar的滑动窗口大小
@@ -98,8 +103,15 @@ public class BarSeries {
             if (code == null) {
                 code = bar.getCode();
             }
+            if (lastBar == null) {
+                lastBar = bar;
+            } else {
+                Assert.isTrue(bar.getTime().compareTo(lastBar.getTime()) >= 0, String.format("bar的时间只能在%s之后", DateUtils.formatToString(lastBar.getTime())));
+                Assert.isTrue(Objects.equals(bar.getPeriod(), lastBar.getPeriod()), String.format("bar的周期只能是: %s", lastBar.getPeriod().getName()));
+            }
             long barIdx = buffer.add(bar, this::emitRemoveBarEvent);
             Assert.isTrue(barIdx >= 0, "追加 Bar 失败");
+            lastBar = bar;
             emitAppendBarEvent(bar, barIdx);
             // TODO ???
         }
