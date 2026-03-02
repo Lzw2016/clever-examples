@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.clever.core.Assert;
 import org.clever.core.DateUtils;
 import org.clever.core.RingBuffer;
+import org.clever.quant.utils.RingBufferUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,13 +87,7 @@ public class BarSeries {
     public List<Bar> getBars(long lastBarIdx, int size) {
         Assert.isTrue(lastBarIdx >= 0, "参数 lastBarIdx 必须大于等于 0");
         Assert.isTrue(size > 0, "参数 size 必须大于等于 0");
-        long startIndex = lastBarIdx - size + 1;
-        if (startIndex < 0) {
-            startIndex = 0;
-            size = (int) (lastBarIdx + 1);
-        }
-        RingBuffer.BufferContent<Bar> content = buffer.getBuffer(startIndex, size);
-        return content.getContent();
+        return RingBufferUtils.getContent(buffer, lastBarIdx, size).getContent();
     }
 
     /**

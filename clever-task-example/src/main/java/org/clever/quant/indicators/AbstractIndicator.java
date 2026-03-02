@@ -6,6 +6,7 @@ import org.clever.quant.AbstractOneTimeBindableBarSeries;
 import org.clever.quant.Bar;
 import org.clever.quant.BarSeries;
 import org.clever.quant.Indicator;
+import org.clever.quant.utils.RingBufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,13 +81,7 @@ public abstract class AbstractIndicator<T> extends AbstractOneTimeBindableBarSer
     public List<T> getValues(long lastBarIdx, int size) {
         Assert.isTrue(lastBarIdx >= 0, "参数 lastBarIdx 必须大于等于 0");
         Assert.isTrue(size > 0, "参数 size 必须大于等于 0");
-        long startIndex = lastBarIdx - size + 1;
-        if (startIndex < 0) {
-            startIndex = 0;
-            size = (int) (lastBarIdx + 1);
-        }
-        RingBuffer.BufferContent<T> content = cache.getBuffer(startIndex, size);
-        return content.getContent();
+        return RingBufferUtils.getContent(cache, lastBarIdx, size).getContent();
     }
 
     @Override
