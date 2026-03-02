@@ -8,6 +8,7 @@ import org.clever.quant.account.SimulationAccount;
 import org.clever.quant.fee.StockTradeFeeStrategy;
 import org.clever.quant.indicators.averages.SMAIndicator;
 import org.clever.quant.indicators.helpers.ClosePriceIndicator;
+import org.clever.quant.position.FullPositionStrategy;
 import org.clever.quant.rules.CrossedDownIndicatorRule;
 import org.clever.quant.rules.CrossedUpIndicatorRule;
 import org.clever.quant.strategy.BaseStrategy;
@@ -104,7 +105,7 @@ public class BaseTest {
         Trader trader = Trader.builder()
             .account(account)
             .strategy(strategy)
-            .positionStrategy(null)
+            .positionStrategy(new FullPositionStrategy())
             .tradeFeeStrategy(new StockTradeFeeStrategy())
             .build();
         trader.start(barSeries);

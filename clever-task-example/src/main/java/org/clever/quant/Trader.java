@@ -48,8 +48,8 @@ public class Trader {
     public Trader(Account account, Strategy strategy, PositionStrategy positionStrategy, TradeFeeStrategy tradeFeeStrategy) {
         Assert.notNull(account, "参数 account 不能为 null");
         Assert.notNull(strategy, "参数 strategy 不能为 null");
-        //Assert.notNull(positionStrategy, "参数 positionStrategy 不能为 null");
-        //Assert.notNull(tradeFeeStrategy, "参数 tradeFeeStrategy 不能为 null");
+        Assert.notNull(positionStrategy, "参数 positionStrategy 不能为 null");
+        Assert.notNull(tradeFeeStrategy, "参数 tradeFeeStrategy 不能为 null");
         this.account = account;
         this.strategy = strategy;
         this.positionStrategy = positionStrategy;

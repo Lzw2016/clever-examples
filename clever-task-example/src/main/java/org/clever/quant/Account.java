@@ -38,7 +38,7 @@ public interface Account {
      * @param fee    手续费(交易成本)
      * @return 如果没有交易就返回 null
      */
-    TradeLog enter(long barIdx, double price, long volume, double fee);
+    TradeLog enter(long barIdx, double price, int volume, double fee);
 
     /**
      * 平仓
@@ -49,5 +49,5 @@ public interface Account {
      * @param fee    手续费(交易成本)
      * @return 如果没有交易就返回 null
      */
-    TradeLog exit(long barIdx, double price, long volume, double fee);
+    TradeLog exit(long barIdx, double price, int volume, double fee);
 }
