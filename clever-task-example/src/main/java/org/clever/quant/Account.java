@@ -24,6 +24,12 @@ public interface Account {
      */
     List<TradeLog> getTradeLogs();
 
+    /**
+     * 获取持仓信息
+     *
+     * @param code 金融产品编码
+     * @return 如果未持仓返回 null
+     */
     Position getPosition(String code);
 
     /**
