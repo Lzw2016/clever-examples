@@ -1,6 +1,7 @@
 package org.clever.quant;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 交易账户
@@ -26,6 +27,7 @@ public interface Account {
 
     /**
      * 指定的“金融产品”历史交易日志
+     *
      * @param code 金融产品编码
      */
     List<TradeLog> getTradeLogs(String code);
@@ -66,4 +68,11 @@ public interface Account {
      * @return 如果没有交易就返回 null
      */
     TradeLog exit(BarSeries barSeries, Bar bar, long barIdx, double price, int volume, double fee);
+
+    /**
+     * 获取当前账户的总资产
+     *
+     * @param priceTable 资产价格表 {@code Map<code, price>}
+     */
+    double getTotalAssets(Map<String, Double> priceTable);
 }

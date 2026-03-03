@@ -89,6 +89,23 @@ public abstract class AbstractAccount implements Account {
         );
     }
 
+    @Override
+    public double getTotalAssets(Map<String, Double> priceTable) {
+        Assert.notNull(priceTable, "参数 priceTable 不能为 null");
+        return syncRead(() -> {
+            double totalAssets = balance;
+            for (Map.Entry<String, Position> entry : positions.entrySet()) {
+                String code = entry.getKey();
+                Position position = entry.getValue();
+                Double price = priceTable.get(code);
+                Assert.notNull(price, String.format("参数 priceTable 中不存在key=%s", code));
+                Assert.isTrue(price > 0, String.format("参数 priceTable 中key=%s的值price=%s必须大于 0", code, price));
+                totalAssets = totalAssets + price * position.getVolume();
+            }
+            return totalAssets;
+        });
+    }
+
     /**
      * 同步多次读取
      */

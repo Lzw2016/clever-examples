@@ -17,6 +17,9 @@ import org.clever.quant.trade.TradeLogger;
 import org.junit.jupiter.api.Test;
 import ta4j.BaseDataSource;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 作者：lizw <br/>
  * 创建时间：2026/02/26 18:13 <br/>
@@ -93,7 +96,6 @@ public class BaseTest {
         log.info("完成");
     }
 
-    @SuppressWarnings("ExtractMethodRecommender")
     @SneakyThrows
     @Test
     public void t03() {
@@ -109,6 +111,8 @@ public class BaseTest {
         trader.registerTradeListener(new TradeLogger());
         trader.start(barSeries);
         String stockCode = "600998.SH";
+        Map<String, Double> priceTable = new HashMap<>();
+        log.info("初始资产: {}", String.format("%.2f", account.getTotalAssets(priceTable)));
         BaseDataSource.get1dkBar(stockCode, stockBarData -> {
             Bar bar = Bar.builder()
                 .code(stockCode)
@@ -122,7 +126,9 @@ public class BaseTest {
                 .amount(stockBarData.getAmount().doubleValue())
                 .build();
             barSeries.appendBar(bar);
+            priceTable.put(bar.getCode(), bar.getClose());
         });
+        log.info("总资产: {}", String.format("%.2f", account.getTotalAssets(priceTable)));
         log.info("完成");
     }
 }
