@@ -5,7 +5,6 @@ import org.clever.core.Assert;
 import org.clever.quant.Account;
 import org.clever.quant.BarSeries;
 import org.clever.quant.PositionStrategy;
-import org.clever.quant.TradeLog;
 
 /**
  * 固定买卖量持仓策略 <br/>
@@ -38,12 +37,12 @@ public class FixedVolumePositionStrategy implements PositionStrategy {
     }
 
     @Override
-    public TradeLog enter(Account tradeAccount, BarSeries barSeries, int barIdx, double price) {
-        return null;
+    public Integer calcEnterVolume(Account tradeAccount, BarSeries barSeries, int barIdx, double price) {
+        return volume;
     }
 
     @Override
-    public TradeLog exit(Account tradeAccount, BarSeries barSeries, int barIdx, double price) {
-        return null;
+    public Integer calcExitVolume(Account tradeAccount, BarSeries barSeries, int barIdx, double price) {
+        return volume;
     }
 }

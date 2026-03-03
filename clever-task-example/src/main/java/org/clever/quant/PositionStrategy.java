@@ -8,24 +8,24 @@ package org.clever.quant;
  */
 public interface PositionStrategy {
     /**
-     * 开仓
+     * 计算开仓量
      *
      * @param tradeAccount 交易账户
      * @param barSeries    BarSeries
      * @param barIdx       Bar的索引位置
      * @param price        预期成交价
-     * @return 如果没有交易就返回 null
+     * @return 返回交易量, 如果不交易就返回 null
      */
-    TradeLog enter(Account tradeAccount, BarSeries barSeries, int barIdx, double price);
+    Integer calcEnterVolume(Account tradeAccount, BarSeries barSeries, int barIdx, double price);
 
     /**
-     * 平仓
+     * 计算平仓量
      *
      * @param tradeAccount 交易账户
      * @param barSeries    BarSeries
      * @param barIdx       Bar的索引位置
      * @param price        预期成交价
-     * @return 如果没有交易就返回 null
+     * @return 返回交易量, 如果不交易就返回 null
      */
-    TradeLog exit(Account tradeAccount, BarSeries barSeries, int barIdx, double price);
+    Integer calcExitVolume(Account tradeAccount, BarSeries barSeries, int barIdx, double price);
 }

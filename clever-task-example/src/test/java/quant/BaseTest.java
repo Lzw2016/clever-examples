@@ -12,6 +12,7 @@ import org.clever.quant.position.FullPositionStrategy;
 import org.clever.quant.rules.CrossedDownIndicatorRule;
 import org.clever.quant.rules.CrossedUpIndicatorRule;
 import org.clever.quant.strategy.BaseStrategy;
+import org.clever.quant.trade.SimulationTrader;
 import org.junit.jupiter.api.Test;
 import ta4j.BaseDataSource;
 
@@ -91,6 +92,7 @@ public class BaseTest {
         log.info("完成");
     }
 
+    @SuppressWarnings("ExtractMethodRecommender")
     @SneakyThrows
     @Test
     public void t03() {
@@ -102,12 +104,7 @@ public class BaseTest {
         Rule exitRule = new CrossedDownIndicatorRule(sma30, sma10);
         Strategy strategy = new BaseStrategy(entryRule, exitRule, "均线相交策略");
         Account account = new SimulationAccount(10_0000);
-        Trader trader = Trader.builder()
-            .account(account)
-            .strategy(strategy)
-            .positionStrategy(new FullPositionStrategy())
-            .tradeFeeStrategy(new StockTradeFeeStrategy())
-            .build();
+        Trader trader = new SimulationTrader(account, strategy, new FullPositionStrategy(), new StockTradeFeeStrategy());
         trader.start(barSeries);
         String stockCode = "600998.SH";
         BaseDataSource.get1dkBar(stockCode, stockBarData -> {

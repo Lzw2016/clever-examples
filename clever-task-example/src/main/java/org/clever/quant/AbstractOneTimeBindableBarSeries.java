@@ -10,7 +10,7 @@ public abstract class AbstractOneTimeBindableBarSeries implements OneTimeBindabl
     /**
      * 当前绑定的 BarSeries
      */
-    protected volatile BarSeries series = null;
+    protected volatile BarSeries series;
 
     @Override
     public synchronized void bind(BarSeries series) {

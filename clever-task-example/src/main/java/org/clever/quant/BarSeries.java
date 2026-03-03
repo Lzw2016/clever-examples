@@ -31,7 +31,7 @@ public class BarSeries {
     /**
      * 最后一个 Bar
      */
-    private volatile Bar lastBar = null;
+    private volatile Bar lastBar;
 
     /**
      * @param slidingWindow 存储Bar的滑动窗口大小

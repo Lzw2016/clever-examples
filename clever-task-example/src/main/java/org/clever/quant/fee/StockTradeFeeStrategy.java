@@ -56,7 +56,7 @@ public class StockTradeFeeStrategy implements TradeFeeStrategy {
     }
 
     @Override
-    public double calcEnterFee(double price, long volume) {
+    public double calcEnterFee(double price, int volume) {
         double amount = price * volume;
         double commission = Math.max(amount * commissionRate, minCommission);
         double transferFee = amount * transferFeeRate;
@@ -64,7 +64,7 @@ public class StockTradeFeeStrategy implements TradeFeeStrategy {
     }
 
     @Override
-    public double calcExitFee(double price, long volume) {
+    public double calcExitFee(double price, int volume) {
         double amount = price * volume;
         double commission = Math.max(amount * commissionRate, minCommission);
         double stampDuty = amount * stampDutyRate;

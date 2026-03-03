@@ -13,7 +13,7 @@ public interface TradeFeeStrategy {
      * @param price  撮合成交价
      * @param volume 成交量
      */
-    double calcEnterFee(double price, long volume);
+    double calcEnterFee(double price, int volume);
 
     /**
      * 计算平仓手续费
@@ -21,5 +21,5 @@ public interface TradeFeeStrategy {
      * @param price  撮合成交价
      * @param volume 成交量
      */
-    double calcExitFee(double price, long volume);
+    double calcExitFee(double price, int volume);
 }
