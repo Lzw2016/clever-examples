@@ -2,8 +2,8 @@ package org.clever.quant.trade;
 
 import lombok.Getter;
 import org.clever.core.Assert;
-import org.clever.core.DateUtils;
 import org.clever.quant.*;
+import org.clever.quant.utils.TradeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +36,10 @@ public abstract class AbstractTrader implements Trader, BarListener {
      * 发生交易时的监听器列表
      */
     protected final List<TradeListener> listeners = new ArrayList<>();
+    /**
+     * 交易量的最小粒度,默认100
+     */
+    protected volatile int volumeStep = 100;
     /**
      * 交易的目标BarSeries
      */
@@ -90,6 +94,22 @@ public abstract class AbstractTrader implements Trader, BarListener {
     }
 
     @Override
+    public void setVolumeStep(int volumeStep) {
+        Assert.isTrue(volumeStep > 0, "参数 volumeStep 必须大于 0");
+        this.volumeStep = volumeStep;
+    }
+
+    @Override
+    public synchronized void registerTradeListener(TradeListener listener) {
+        Assert.notNull(listener, "参数 listener 不能为 null");
+        boolean exist = listeners.stream().anyMatch(item -> item == listener);
+        if (exist) {
+            return;
+        }
+        listeners.add(listener);
+    }
+
+    @Override
     public void start(BarSeries mainBarSeries) {
         Assert.notNull(mainBarSeries, "参数 mainBarSeries 不能为 null");
         Assert.isNull(this.mainBarSeries, "不能重复调用 start");
@@ -126,6 +146,7 @@ public abstract class AbstractTrader implements Trader, BarListener {
         if (minBarIdx <= lastBarIdx) {
             return;
         }
+        // TODO 更新 account 中 Position 的 availableVolume
         // 交易逻辑
         lastBarIdx = minBarIdx;
         final boolean liveTrading = isLiveTrading();
@@ -134,25 +155,25 @@ public abstract class AbstractTrader implements Trader, BarListener {
         if (!liveTrading) {
             // 模拟
             if (nextBarEnter) {
-                doEnter(mainBar, lastBarIdx);
+                doEnter(accountSnapshot, mainBar, lastBarIdx);
             }
             if (nextBarExit) {
-                doExit(mainBar, lastBarIdx);
+                doExit(accountSnapshot, mainBar, lastBarIdx);
             }
         }
-        final boolean enter = strategy.shouldEnter(lastBarIdx, account.getSnapshot());
-        final boolean exit = strategy.shouldExit(lastBarIdx, account.getSnapshot());
+        final boolean enter = strategy.shouldEnter(lastBarIdx, accountSnapshot);
+        final boolean exit = strategy.shouldExit(lastBarIdx, accountSnapshot);
         nextBarEnter = false;
         nextBarExit = false;
         if (liveTrading) {
             // 实盘
             if (isMarketOpen(mainBar.getCode(), mainBar)) {
-                // 开市了
+                // 开市状态
                 if (enter) {
-                    doEnter(mainBar, lastBarIdx);
+                    doEnter(accountSnapshot, mainBar, lastBarIdx);
                 }
                 if (exit) {
-                    doExit(mainBar, lastBarIdx);
+                    doExit(accountSnapshot, mainBar, lastBarIdx);
                 }
             }
         } else {
@@ -165,24 +186,72 @@ public abstract class AbstractTrader implements Trader, BarListener {
     /**
      * 开仓
      */
-    protected void doEnter(final Bar mainBar, final long barIdx) {
+    protected void doEnter(final TradeAccountSnapshot accountSnapshot, final Bar mainBar, final long barIdx) {
         final double price = calcEnterPrice(mainBar, barIdx);
-        String date = DateUtils.formatToString(mainBar.getTime(), DateUtils.yyyy_MM_dd);
-        log.info("买入 @ {} 价格: {}", date, String.format("%.4f", price));
-        account.enter(barIdx, mainBar.getClose(), 1000, 5);
+        Integer volume = TradeUtils.calcEnterVolume(positionStrategy, tradeFeeStrategy, volumeStep, account, accountSnapshot, price, mainBarSeries, mainBar, barIdx);
+        if (volume == null) {
+            return;
+        }
+        volume = volume - (volume % volumeStep);
+        if (volume <= 0) {
+            return;
+        }
+        final double fee = tradeFeeStrategy.calcEnterFee(price, volume);
+        final TradeLog tradeLog = account.enter(mainBarSeries, mainBar, barIdx, price, volume, fee);
+        if (tradeLog == null) {
+            return;
+        }
+        emitEnterEvent(tradeLog, account);
     }
 
     /**
      * 平仓
      */
-    protected void doExit(final Bar mainBar, final long barIdx) {
+    protected void doExit(final TradeAccountSnapshot accountSnapshot, final Bar mainBar, final long barIdx) {
         final double price = calcExitPrice(mainBar, barIdx);
-        String date = DateUtils.formatToString(mainBar.getTime(), DateUtils.yyyy_MM_dd);
+        Integer volume = positionStrategy.calcExitVolume(accountSnapshot, price, mainBarSeries, mainBar, barIdx);
+        if (volume == null) {
+            return;
+        }
+        volume = volume - (volume % volumeStep);
+        if (volume <= 0) {
+            return;
+        }
+        // TODO 判断当前有没有这么多持仓量
+        final double fee = tradeFeeStrategy.calcEnterFee(price, volume);
+        final TradeLog tradeLog = account.exit(mainBarSeries, mainBar, barIdx, price, volume, fee);
+        if (tradeLog == null) {
+            return;
+        }
+        emitExitEvent(tradeLog, account);
+    }
 
+    /**
+     * 开仓事件
+     */
+    protected void emitEnterEvent(TradeLog tradeLog, Account account) {
+        for (TradeListener listener : listeners) {
+            try {
+                listener.onEnter(tradeLog, account);
+            } catch (Exception err) {
+                log.error("onEnter事件回调异常, listener={}", listener, err);
+                // System.exit(-1);
+            }
+        }
+    }
 
-
-        log.info("卖出 @ {} 价格: {}", date, String.format("%.4f", price));
-        account.exit(barIdx, mainBar.getClose(), 1000, 5);
+    /**
+     * 平仓事件
+     */
+    protected void emitExitEvent(TradeLog tradeLog, Account account) {
+        for (TradeListener listener : listeners) {
+            try {
+                listener.onExit(tradeLog, account);
+            } catch (Exception err) {
+                log.error("onExit事件回调异常, listener={}", listener, err);
+                // System.exit(-1);
+            }
+        }
     }
 
     /**
@@ -214,3 +283,4 @@ public abstract class AbstractTrader implements Trader, BarListener {
      */
     protected abstract double calcExitPrice(Bar bar, long barIdx);
 }
+

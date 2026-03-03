@@ -8,6 +8,18 @@ package org.clever.quant;
  */
 public interface Trader {
     /**
+     * 设置交易量的最小粒度
+     */
+    void setVolumeStep(int volumeStep);
+
+    /**
+     * 交易量的最小粒度,默认100
+     */
+    default int getVolumeStep() {
+        return 100;
+    }
+
+    /**
      * 交易账户
      */
     Account getAccount();
@@ -26,6 +38,11 @@ public interface Trader {
      * 交易手续费计算策略
      */
     TradeFeeStrategy getTradeFeeStrategy();
+
+    /**
+     * 注册交易监听器,用于监听 开仓/平仓 事件
+     */
+    void registerTradeListener(TradeListener listener);
 
     /**
      * 开始交易

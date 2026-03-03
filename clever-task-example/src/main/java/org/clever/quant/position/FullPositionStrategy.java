@@ -1,8 +1,6 @@
 package org.clever.quant.position;
 
-import org.clever.quant.Account;
-import org.clever.quant.BarSeries;
-import org.clever.quant.PositionStrategy;
+import org.clever.quant.*;
 
 /**
  * 满仓策略 <br/>
@@ -14,12 +12,16 @@ import org.clever.quant.PositionStrategy;
  */
 public class FullPositionStrategy implements PositionStrategy {
     @Override
-    public Integer calcEnterVolume(Account tradeAccount, BarSeries barSeries, int barIdx, double price) {
-        return (int) Math.floor(tradeAccount.getBalance() / price);
+    public Integer calcEnterVolume(TradeAccountSnapshot accountSnapshot, double price, BarSeries barSeries, Bar bar, long barIdx) {
+        return (int) Math.floor(accountSnapshot.getBalance() / price);
     }
 
     @Override
-    public Integer calcExitVolume(Account tradeAccount, BarSeries barSeries, int barIdx, double price) {
-        return (int) Math.floor(tradeAccount.getBalance() / price);
+    public Integer calcExitVolume(TradeAccountSnapshot accountSnapshot, double price, BarSeries barSeries, Bar bar, long barIdx) {
+        Position position = accountSnapshot.getPosition(bar.getCode());
+        if (position == null) {
+            return null;
+        }
+        return position.getAvailableVolume();
     }
 }

@@ -4,15 +4,16 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.clever.core.DateUtils;
 import org.clever.quant.*;
-import org.clever.quant.account.SimulationAccount;
+import org.clever.quant.account.PaperAccount;
 import org.clever.quant.fee.StockTradeFeeStrategy;
 import org.clever.quant.indicators.averages.SMAIndicator;
 import org.clever.quant.indicators.helpers.ClosePriceIndicator;
-import org.clever.quant.position.FullPositionStrategy;
+import org.clever.quant.position.FixedVolumePositionStrategy;
 import org.clever.quant.rules.CrossedDownIndicatorRule;
 import org.clever.quant.rules.CrossedUpIndicatorRule;
 import org.clever.quant.strategy.BaseStrategy;
-import org.clever.quant.trade.SimulationTrader;
+import org.clever.quant.trade.PaperTrader;
+import org.clever.quant.trade.TradeLogger;
 import org.junit.jupiter.api.Test;
 import ta4j.BaseDataSource;
 
@@ -60,17 +61,17 @@ public class BaseTest {
         Rule entryRule = new CrossedUpIndicatorRule(sma30, sma10);
         Rule exitRule = new CrossedDownIndicatorRule(sma30, sma10);
         Strategy strategy = new BaseStrategy(entryRule, exitRule, "均线相交策略");
-        Account account = new SimulationAccount(10_0000);
+        Account account = new PaperAccount(10_0000);
         barSeries.registerBarListener((bar, barIdx) -> {
             String date = DateUtils.formatToString(bar.getTime(), DateUtils.yyyy_MM_dd);
             String price = String.format("%.4f", bar.getClose());
             if (strategy.shouldEnter(barIdx, account.getSnapshot())) {
                 log.info("买入 @ {} 价格: {}", date, price);
-                account.enter(barIdx, bar.getClose(), 1000, 5);
+                account.enter(barSeries, bar, barIdx, bar.getClose(), 1000, 5);
             }
             if (strategy.shouldExit(barIdx, account.getSnapshot())) {
                 log.info("卖出 @ {} 价格: {}", date, price);
-                account.exit(barIdx, bar.getClose(), 1000, 5);
+                account.exit(barSeries, bar, barIdx, bar.getClose(), 1000, 5);
             }
         });
         String stockCode = "600998.SH";
@@ -103,8 +104,9 @@ public class BaseTest {
         Rule entryRule = new CrossedUpIndicatorRule(sma30, sma10);
         Rule exitRule = new CrossedDownIndicatorRule(sma30, sma10);
         Strategy strategy = new BaseStrategy(entryRule, exitRule, "均线相交策略");
-        Account account = new SimulationAccount(10_0000);
-        Trader trader = new SimulationTrader(account, strategy, new FullPositionStrategy(), new StockTradeFeeStrategy());
+        Account account = new PaperAccount(10_0000);
+        Trader trader = new PaperTrader(account, strategy, new FixedVolumePositionStrategy(), new StockTradeFeeStrategy());
+        trader.registerTradeListener(new TradeLogger());
         trader.start(barSeries);
         String stockCode = "600998.SH";
         BaseDataSource.get1dkBar(stockCode, stockBarData -> {

@@ -17,11 +17,11 @@ public class Position {
     /**
      * 持有总量
      */
-    private long volume;
+    private int volume;
     /**
      * 可用量
      */
-    private long availableVolume;
+    private int availableVolume;
     /**
      * 平均成本价
      */

@@ -8,14 +8,14 @@ import org.clever.quant.*;
  * 作者：lizw <br/>
  * 创建时间：2026/03/03 10:20 <br/>
  */
-public class SimulationTrader extends AbstractTrader {
+public class PaperTrader extends AbstractTrader {
     /**
      * @param account          交易账户
      * @param strategy         交易策略
      * @param positionStrategy 持仓策略
      * @param tradeFeeStrategy 交易手续费计算策略
      */
-    public SimulationTrader(Account account, Strategy strategy, PositionStrategy positionStrategy, TradeFeeStrategy tradeFeeStrategy) {
+    public PaperTrader(Account account, Strategy strategy, PositionStrategy positionStrategy, TradeFeeStrategy tradeFeeStrategy) {
         super(account, strategy, positionStrategy, tradeFeeStrategy);
     }
 

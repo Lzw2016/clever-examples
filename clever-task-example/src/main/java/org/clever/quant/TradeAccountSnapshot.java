@@ -3,7 +3,7 @@ package org.clever.quant;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * 交易账户快照
@@ -15,11 +15,22 @@ import java.util.List;
 @Data
 public class TradeAccountSnapshot {
     /**
-     * 持仓状态
+     * 持仓状态 {@code Map<code, Position>}
      */
-    private final List<Position> positions;
+    private final Map<String, Position> positions;
     /**
      * 账户余额
      */
     private final double balance;
+
+    /**
+     * TODO 抽象成持仓信息相关接口
+     * 获取持仓信息
+     *
+     * @param code 金融产品编码
+     * @return 如果未持仓返回 null
+     */
+    public Position getPosition(String code) {
+        return positions.get(code);
+    }
 }

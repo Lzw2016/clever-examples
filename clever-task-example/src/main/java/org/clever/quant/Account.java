@@ -32,22 +32,24 @@ public interface Account {
     /**
      * 开仓
      *
-     * @param barIdx Bar的索引位置
-     * @param price  撮合成交价
-     * @param volume 成交量
-     * @param fee    手续费(交易成本)
+     * @param barSeries 交易的目标 BarSeries
+     * @param barIdx    Bar的索引位置
+     * @param price     撮合成交价
+     * @param volume    成交量
+     * @param fee       手续费(交易成本)
      * @return 如果没有交易就返回 null
      */
-    TradeLog enter(long barIdx, double price, int volume, double fee);
+    TradeLog enter(BarSeries barSeries, Bar bar, long barIdx, double price, int volume, double fee);
 
     /**
      * 平仓
      *
-     * @param barIdx Bar的索引位置
-     * @param price  撮合成交价
-     * @param volume 成交量
-     * @param fee    手续费(交易成本)
+     * @param barSeries 交易的目标 BarSeries
+     * @param barIdx    Bar的索引位置
+     * @param price     撮合成交价
+     * @param volume    成交量
+     * @param fee       手续费(交易成本)
      * @return 如果没有交易就返回 null
      */
-    TradeLog exit(long barIdx, double price, int volume, double fee);
+    TradeLog exit(BarSeries barSeries, Bar bar, long barIdx, double price, int volume, double fee);
 }

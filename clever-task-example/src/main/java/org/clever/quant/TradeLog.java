@@ -41,7 +41,7 @@ public class TradeLog {
     /**
      * 成交量
      */
-    private final long volume;
+    private final int volume;
     /**
      * 手续费(交易成本)
      */
@@ -60,7 +60,7 @@ public class TradeLog {
      * @param volume    成交量
      * @param fee       手续费(交易成本)
      */
-    public TradeLog(String code, TradeType tradeType, long barIdx, Date time, double price, long volume, double fee) {
+    public TradeLog(String code, TradeType tradeType, long barIdx, Date time, double price, int volume, double fee) {
         Assert.isNotBlank(code, "参数 code 不能为空");
         Assert.notNull(tradeType, "参数 tradeType 不能为 null");
         Assert.isTrue(barIdx >= 0, "参数 barIdx 必须大于等于 0");
