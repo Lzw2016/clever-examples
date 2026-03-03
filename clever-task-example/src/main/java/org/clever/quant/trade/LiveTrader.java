@@ -26,7 +26,7 @@ public class LiveTrader extends AbstractTrader {
 
     @Override
     protected boolean isMarketOpen(String code, Bar bar) {
-        // TODO ???
+        // TODO isMarketOpen
         return false;
     }
 

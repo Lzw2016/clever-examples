@@ -1,10 +1,8 @@
 package org.clever.quant.account;
 
 import org.clever.core.Assert;
-import org.clever.quant.Bar;
-import org.clever.quant.BarSeries;
-import org.clever.quant.TradeLog;
-import org.clever.quant.TradeType;
+import org.clever.quant.*;
+import org.clever.quant.utils.TradeUtils;
 
 /**
  * 模拟账号
@@ -45,8 +43,9 @@ public class PaperAccount extends AbstractAccount {
             double balance = this.balance;
             this.balance = balance - amount;
             Assert.isTrue(this.balance >= 0, String.format("开仓之后 balance 不能小于 0, balance=%s", String.format("%.4f", this.balance)));
-            // TODO 更新持仓状态
-
+            // 更新持仓状态
+            Position position = positions.computeIfAbsent(bar.getCode(), Position::new);
+            position.increase(volume, price, fee, TradeUtils.calcUnlockTime(bar));
             //  增加历史记录
             tradeLogs.add(tradeLog);
             return tradeLog;
@@ -69,8 +68,13 @@ public class PaperAccount extends AbstractAccount {
             double amount = volume * price - fee;
             double balance = this.balance;
             this.balance = balance + amount;
-            // TODO 更新持仓状态
-
+            // 更新持仓状态
+            Position position = positions.get(bar.getCode());
+            Assert.notNull(position, String.format("未持仓当前品种“%s”无法平仓", bar.getCode()));
+            int positionVolume = position.decrease(volume, price, fee);
+            if (positionVolume <= 0) {
+                positions.remove(bar.getCode());
+            }
             // 增加历史记录
             tradeLogs.add(tradeLog);
             return tradeLog;

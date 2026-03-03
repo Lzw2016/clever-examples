@@ -25,6 +25,12 @@ public interface Account {
     List<TradeLog> getTradeLogs();
 
     /**
+     * 指定的“金融产品”历史交易日志
+     * @param code 金融产品编码
+     */
+    List<TradeLog> getTradeLogs(String code);
+
+    /**
      * 获取持仓信息
      *
      * @param code 金融产品编码

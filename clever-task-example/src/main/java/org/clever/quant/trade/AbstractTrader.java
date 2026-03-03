@@ -146,7 +146,13 @@ public abstract class AbstractTrader implements Trader, BarListener {
         if (minBarIdx <= lastBarIdx) {
             return;
         }
-        // TODO 更新 account 中 Position 的 availableVolume
+        // 更新 account 中 Position 的 availableVolume
+        for (String code : barIdxMap.keySet()) {
+            Position position = account.getPosition(code);
+            if (position != null) {
+                position.unlockVolumes(bar.getTime());
+            }
+        }
         // 交易逻辑
         lastBarIdx = minBarIdx;
         final boolean liveTrading = isLiveTrading();
@@ -208,15 +214,10 @@ public abstract class AbstractTrader implements Trader, BarListener {
      */
     protected void doExit(final Bar mainBar, final long barIdx) {
         final double price = calcExitPrice(mainBar, barIdx);
-        Integer volume = positionStrategy.calcExitVolume(account, price, mainBarSeries, mainBar, barIdx);
-        if (volume == null) {
+        Integer volume = TradeUtils.calcExitVolume(positionStrategy, tradeFeeStrategy, account, price, mainBarSeries, mainBar, barIdx);
+        if (volume == null || volume <= 0) {
             return;
         }
-        volume = volume - (volume % volumeStep);
-        if (volume <= 0) {
-            return;
-        }
-        // TODO 判断当前有没有这么多持仓量
         final double fee = tradeFeeStrategy.calcEnterFee(price, volume);
         final TradeLog tradeLog = account.exit(mainBarSeries, mainBar, barIdx, price, volume, fee);
         if (tradeLog == null) {

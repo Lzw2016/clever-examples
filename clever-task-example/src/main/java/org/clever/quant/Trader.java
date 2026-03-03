@@ -45,7 +45,7 @@ public interface Trader {
     void registerTradeListener(TradeListener listener);
 
     /**
-     * 开始交易
+     * 开始交易(只能start一次)
      *
      * @param mainBarSeries 交易的目标BarSeries
      */

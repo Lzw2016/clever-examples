@@ -8,7 +8,7 @@ import org.clever.quant.account.PaperAccount;
 import org.clever.quant.fee.StockTradeFeeStrategy;
 import org.clever.quant.indicators.averages.SMAIndicator;
 import org.clever.quant.indicators.helpers.ClosePriceIndicator;
-import org.clever.quant.position.FixedVolumePositionStrategy;
+import org.clever.quant.position.FullPositionStrategy;
 import org.clever.quant.rules.CrossedDownIndicatorRule;
 import org.clever.quant.rules.CrossedUpIndicatorRule;
 import org.clever.quant.strategy.BaseStrategy;
@@ -105,7 +105,7 @@ public class BaseTest {
         Rule exitRule = new CrossedDownIndicatorRule(sma30, sma10);
         Strategy strategy = new BaseStrategy(entryRule, exitRule, "均线相交策略");
         Account account = new PaperAccount(10_0000);
-        Trader trader = new PaperTrader(account, strategy, new FixedVolumePositionStrategy(), new StockTradeFeeStrategy());
+        Trader trader = new PaperTrader(account, strategy, new FullPositionStrategy(), new StockTradeFeeStrategy());
         trader.registerTradeListener(new TradeLogger());
         trader.start(barSeries);
         String stockCode = "600998.SH";

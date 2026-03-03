@@ -9,10 +9,7 @@ import org.clever.quant.TradeLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -71,9 +68,15 @@ public abstract class AbstractAccount implements Account {
         return syncRead(() -> Collections.unmodifiableList(tradeLogs));
     }
 
+    @Override
+    public List<TradeLog> getTradeLogs(String code) {
+        Assert.isNotBlank(code, "参数 code 不能为空");
+        return syncRead(() -> tradeLogs.stream().filter(tradeLog -> Objects.equals(tradeLog.getCode(), code)).toList());
+    }
 
     @Override
     public Position getPosition(String code) {
+        Assert.isNotBlank(code, "参数 code 不能为空");
         return syncRead(() -> positions.get(code));
     }
 
