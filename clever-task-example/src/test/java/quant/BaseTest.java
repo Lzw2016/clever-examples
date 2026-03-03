@@ -65,11 +65,11 @@ public class BaseTest {
         barSeries.registerBarListener((bar, barIdx) -> {
             String date = DateUtils.formatToString(bar.getTime(), DateUtils.yyyy_MM_dd);
             String price = String.format("%.4f", bar.getClose());
-            if (strategy.shouldEnter(barIdx, account.getSnapshot())) {
+            if (strategy.shouldEnter(barIdx, account)) {
                 log.info("买入 @ {} 价格: {}", date, price);
                 account.enter(barSeries, bar, barIdx, bar.getClose(), 1000, 5);
             }
-            if (strategy.shouldExit(barIdx, account.getSnapshot())) {
+            if (strategy.shouldExit(barIdx, account)) {
                 log.info("卖出 @ {} 价格: {}", date, price);
                 account.exit(barSeries, bar, barIdx, bar.getClose(), 1000, 5);
             }

@@ -44,27 +44,27 @@ public interface Strategy {
     /**
      * 当前barIdx位置是否应该开仓
      *
-     * @param barIdx          Bar的索引位置
-     * @param accountSnapshot 交易账户快照
+     * @param barIdx  Bar的索引位置
+     * @param account 交易账户
      */
-    default boolean shouldEnter(long barIdx, TradeAccountSnapshot accountSnapshot) {
-        Assert.notNull(accountSnapshot, "参数 accountSnapshot 不能为 null");
+    default boolean shouldEnter(long barIdx, Account account) {
+        Assert.notNull(account, "参数 account 不能为 null");
         Rule entryRule = getEntryRule();
         Assert.notNull(entryRule, "entryRule 不能为 null");
-        return entryRule.isSatisfied(barIdx, accountSnapshot);
+        return entryRule.isSatisfied(barIdx, account);
     }
 
     /**
      * 当前barIdx位置是否应该平仓
      *
-     * @param barIdx          Bar的索引位置
-     * @param accountSnapshot 交易账户快照
+     * @param barIdx  Bar的索引位置
+     * @param account 交易账户
      */
-    default boolean shouldExit(long barIdx, TradeAccountSnapshot accountSnapshot) {
-        Assert.notNull(accountSnapshot, "参数 accountSnapshot 不能为 null");
+    default boolean shouldExit(long barIdx, Account account) {
+        Assert.notNull(account, "参数 account 不能为 null");
         Rule exitRule = getExitRule();
         Assert.notNull(exitRule, "exitRule 不能为 null");
-        return exitRule.isSatisfied(barIdx, accountSnapshot);
+        return exitRule.isSatisfied(barIdx, account);
     }
 
     Strategy and(Strategy strategy, String name);

@@ -9,7 +9,11 @@ import org.clever.quant.TradeLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
@@ -40,7 +44,7 @@ public abstract class AbstractAccount implements Account {
     /**
      * 持仓状态 {@code Map<code, Position>}
      */
-    protected final Map<String, Position> positions = new HashMap<>();
+    protected final Map<String, Position> positions = new ConcurrentHashMap<>();
     /**
      * 所有的历史交易日志
      */
@@ -59,12 +63,24 @@ public abstract class AbstractAccount implements Account {
 
     @Override
     public double getBalance() {
-        return balance;
+        return syncRead(() -> balance);
     }
 
     @Override
     public List<TradeLog> getTradeLogs() {
         return syncRead(() -> Collections.unmodifiableList(tradeLogs));
+    }
+
+    /**
+     * TODO 抽象成持仓信息相关接口
+     * 获取持仓信息
+     *
+     * @param code 金融产品编码
+     * @return 如果未持仓返回 null
+     */
+    @Override
+    public Position getPosition(String code) {
+        return syncRead(() -> positions.get(code));
     }
 
     @Override

@@ -2,10 +2,10 @@ package org.clever.quant.position;
 
 import lombok.Data;
 import org.clever.core.Assert;
+import org.clever.quant.Account;
 import org.clever.quant.Bar;
 import org.clever.quant.BarSeries;
 import org.clever.quant.PositionStrategy;
-import org.clever.quant.TradeAccountSnapshot;
 
 /**
  * 固定买卖金额持仓策略 <br/>
@@ -31,12 +31,12 @@ public class FixedAmountPositionStrategy implements PositionStrategy {
     }
 
     @Override
-    public Integer calcEnterVolume(TradeAccountSnapshot accountSnapshot, double price, BarSeries barSeries, Bar bar, long barIdx) {
+    public Integer calcEnterVolume(Account account, double price, BarSeries barSeries, Bar bar, long barIdx) {
         return (int) Math.floor(amount / price);
     }
 
     @Override
-    public Integer calcExitVolume(TradeAccountSnapshot accountSnapshot, double price, BarSeries barSeries, Bar bar, long barIdx) {
+    public Integer calcExitVolume(Account account, double price, BarSeries barSeries, Bar bar, long barIdx) {
         return (int) Math.floor(amount / price);
     }
 }

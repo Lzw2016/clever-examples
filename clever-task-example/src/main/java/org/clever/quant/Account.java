@@ -24,6 +24,8 @@ public interface Account {
      */
     List<TradeLog> getTradeLogs();
 
+    Position getPosition(String code);
+
     /**
      * 当前账户快照
      */

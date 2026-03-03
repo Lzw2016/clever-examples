@@ -12,13 +12,13 @@ import org.clever.quant.*;
  */
 public class FullPositionStrategy implements PositionStrategy {
     @Override
-    public Integer calcEnterVolume(TradeAccountSnapshot accountSnapshot, double price, BarSeries barSeries, Bar bar, long barIdx) {
-        return (int) Math.floor(accountSnapshot.getBalance() / price);
+    public Integer calcEnterVolume(Account account, double price, BarSeries barSeries, Bar bar, long barIdx) {
+        return (int) Math.floor(account.getBalance() / price);
     }
 
     @Override
-    public Integer calcExitVolume(TradeAccountSnapshot accountSnapshot, double price, BarSeries barSeries, Bar bar, long barIdx) {
-        Position position = accountSnapshot.getPosition(bar.getCode());
+    public Integer calcExitVolume(Account account, double price, BarSeries barSeries, Bar bar, long barIdx) {
+        Position position = account.getPosition(bar.getCode());
         if (position == null) {
             return null;
         }

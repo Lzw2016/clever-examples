@@ -2,8 +2,8 @@ package org.clever.quant.rules;
 
 import lombok.Getter;
 import org.clever.core.Assert;
+import org.clever.quant.Account;
 import org.clever.quant.Rule;
-import org.clever.quant.TradeAccountSnapshot;
 
 /**
  * 作者：lizw <br/>
@@ -28,7 +28,7 @@ public class OrRule extends AbstractRule {
     }
 
     @Override
-    public boolean isSatisfied(long index, TradeAccountSnapshot accountSnapshot) {
-        return rule1.isSatisfied(index, accountSnapshot) || rule2.isSatisfied(index, accountSnapshot);
+    public boolean isSatisfied(long index, Account account) {
+        return rule1.isSatisfied(index, account) || rule2.isSatisfied(index, account);
     }
 }

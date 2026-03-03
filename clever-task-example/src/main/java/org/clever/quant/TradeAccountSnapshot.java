@@ -22,15 +22,4 @@ public class TradeAccountSnapshot {
      * 账户余额
      */
     private final double balance;
-
-    /**
-     * TODO 抽象成持仓信息相关接口
-     * 获取持仓信息
-     *
-     * @param code 金融产品编码
-     * @return 如果未持仓返回 null
-     */
-    public Position getPosition(String code) {
-        return positions.get(code);
-    }
 }

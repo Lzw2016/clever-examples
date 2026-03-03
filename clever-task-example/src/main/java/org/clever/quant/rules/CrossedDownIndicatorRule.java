@@ -1,8 +1,8 @@
 package org.clever.quant.rules;
 
 import org.clever.core.Assert;
+import org.clever.quant.Account;
 import org.clever.quant.Indicator;
-import org.clever.quant.TradeAccountSnapshot;
 import org.clever.quant.indicators.helpers.ConstantIndicator;
 import org.clever.quant.indicators.helpers.CrossIndicator;
 
@@ -44,7 +44,7 @@ public class CrossedDownIndicatorRule extends AbstractRule {
     }
 
     @Override
-    public boolean isSatisfied(long barIdx, TradeAccountSnapshot accountSnapshot) {
+    public boolean isSatisfied(long barIdx, Account account) {
         return Optional.ofNullable(cross.getValue(barIdx)).orElse(false);
     }
 

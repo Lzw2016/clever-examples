@@ -150,19 +150,18 @@ public abstract class AbstractTrader implements Trader, BarListener {
         // 交易逻辑
         lastBarIdx = minBarIdx;
         final boolean liveTrading = isLiveTrading();
-        final TradeAccountSnapshot accountSnapshot = account.getSnapshot();
         final Bar mainBar = mainBarSeries.getBar(lastBarIdx);
         if (!liveTrading) {
             // 模拟
             if (nextBarEnter) {
-                doEnter(accountSnapshot, mainBar, lastBarIdx);
+                doEnter(mainBar, lastBarIdx);
             }
             if (nextBarExit) {
-                doExit(accountSnapshot, mainBar, lastBarIdx);
+                doExit(mainBar, lastBarIdx);
             }
         }
-        final boolean enter = strategy.shouldEnter(lastBarIdx, accountSnapshot);
-        final boolean exit = strategy.shouldExit(lastBarIdx, accountSnapshot);
+        final boolean enter = strategy.shouldEnter(lastBarIdx, account);
+        final boolean exit = strategy.shouldExit(lastBarIdx, account);
         nextBarEnter = false;
         nextBarExit = false;
         if (liveTrading) {
@@ -170,10 +169,10 @@ public abstract class AbstractTrader implements Trader, BarListener {
             if (isMarketOpen(mainBar.getCode(), mainBar)) {
                 // 开市状态
                 if (enter) {
-                    doEnter(accountSnapshot, mainBar, lastBarIdx);
+                    doEnter(mainBar, lastBarIdx);
                 }
                 if (exit) {
-                    doExit(accountSnapshot, mainBar, lastBarIdx);
+                    doExit(mainBar, lastBarIdx);
                 }
             }
         } else {
@@ -186,9 +185,9 @@ public abstract class AbstractTrader implements Trader, BarListener {
     /**
      * 开仓
      */
-    protected void doEnter(final TradeAccountSnapshot accountSnapshot, final Bar mainBar, final long barIdx) {
+    protected void doEnter(final Bar mainBar, final long barIdx) {
         final double price = calcEnterPrice(mainBar, barIdx);
-        Integer volume = TradeUtils.calcEnterVolume(positionStrategy, tradeFeeStrategy, volumeStep, account, accountSnapshot, price, mainBarSeries, mainBar, barIdx);
+        Integer volume = TradeUtils.calcEnterVolume(positionStrategy, tradeFeeStrategy, volumeStep, account, price, mainBarSeries, mainBar, barIdx);
         if (volume == null) {
             return;
         }
@@ -207,9 +206,9 @@ public abstract class AbstractTrader implements Trader, BarListener {
     /**
      * 平仓
      */
-    protected void doExit(final TradeAccountSnapshot accountSnapshot, final Bar mainBar, final long barIdx) {
+    protected void doExit(final Bar mainBar, final long barIdx) {
         final double price = calcExitPrice(mainBar, barIdx);
-        Integer volume = positionStrategy.calcExitVolume(accountSnapshot, price, mainBarSeries, mainBar, barIdx);
+        Integer volume = positionStrategy.calcExitVolume(account, price, mainBarSeries, mainBar, barIdx);
         if (volume == null) {
             return;
         }

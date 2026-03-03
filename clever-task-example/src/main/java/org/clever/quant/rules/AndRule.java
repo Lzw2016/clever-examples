@@ -2,8 +2,8 @@ package org.clever.quant.rules;
 
 import lombok.Getter;
 import org.clever.core.Assert;
+import org.clever.quant.Account;
 import org.clever.quant.Rule;
-import org.clever.quant.TradeAccountSnapshot;
 
 /**
  * 作者：lizw <br/>
@@ -28,7 +28,7 @@ public class AndRule extends AbstractRule {
     }
 
     @Override
-    public boolean isSatisfied(long barIdx, TradeAccountSnapshot accountSnapshot) {
-        return rule1.isSatisfied(barIdx, accountSnapshot) && rule2.isSatisfied(barIdx, accountSnapshot);
+    public boolean isSatisfied(long barIdx, Account account) {
+        return rule1.isSatisfied(barIdx, account) && rule2.isSatisfied(barIdx, account);
     }
 }

@@ -26,11 +26,11 @@ public interface Rule {
     /**
      * 是否满足当前规则
      *
-     * @param barIdx          Bar的索引位置
-     * @param accountSnapshot 交易账户快照
+     * @param barIdx  Bar的索引位置
+     * @param account 交易账户
      * @return 如果瞒住当前规则返回 true
      */
-    boolean isSatisfied(long barIdx, TradeAccountSnapshot accountSnapshot);
+    boolean isSatisfied(long barIdx, Account account);
 
     default Rule and(Rule rule, String name) {
         return new AndRule(this, rule, name);
