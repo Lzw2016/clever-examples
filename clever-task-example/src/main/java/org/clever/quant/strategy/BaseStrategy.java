@@ -1,6 +1,6 @@
 package org.clever.quant.strategy;
 
-import lombok.Setter;
+import lombok.Getter;
 import org.clever.core.Assert;
 import org.clever.quant.Rule;
 import org.clever.quant.Strategy;
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  * 作者：lizw <br/>
  * 创建时间：2026/02/27 14:38 <br/>
  */
-@Setter
+@Getter
 public class BaseStrategy implements Strategy {
     protected final Logger log = LoggerFactory.getLogger(getClass());
     protected final String name;
