@@ -218,7 +218,7 @@ public abstract class AbstractTrader implements Trader, BarListener {
         if (volume == null || volume <= 0) {
             return;
         }
-        final double fee = tradeFeeStrategy.calcEnterFee(price, volume);
+        final double fee = tradeFeeStrategy.calcExitFee(price, volume);
         final TradeLog tradeLog = account.exit(mainBarSeries, mainBar, barIdx, price, volume, fee);
         if (tradeLog == null) {
             return;
