@@ -18,7 +18,7 @@ public class BacktestStrategy {
      */
     private Long id;
     /**
-     * 回撤id
+     * 回测id
      */
     private Long backtestRecordId;
     /**

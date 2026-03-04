@@ -3,6 +3,7 @@ package quant.entity;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 回测bar序列配置
@@ -17,13 +18,13 @@ public class BacktestBarSeries {
      */
     private Long id;
     /**
-     * 回撤id
+     * 回测id
      */
     private Long backtestRecordId;
     /**
      * 是否是交易目标bar(0否 / 1是)
      */
-    private Integer main;
+    private Boolean main;
     /**
      * 数据源
      */
@@ -63,7 +64,7 @@ public class BacktestBarSeries {
     /**
      * 扩展数据
      */
-    private String extData;
+    private Map<String, Object> extData;
     /**
      * 创建时间
      */

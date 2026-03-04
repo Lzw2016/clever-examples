@@ -1,10 +1,12 @@
 package org.clever.quant;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.clever.core.Assert;
 import org.clever.core.Conv;
 import org.clever.core.DateUtils;
 import org.clever.core.RingBuffer;
+import org.clever.core.id.SnowFlake;
 import org.clever.quant.utils.RingBufferUtils;
 
 import java.time.LocalTime;
@@ -30,6 +32,11 @@ public class BarSeries extends AbstractExtData {
      * 开盘日开始交易时间
      */
     public static final String TRADING_START_TIME = "tradingStartTime";
+    /**
+     * BarSeries 实例id
+     */
+    @Getter
+    private final long id = SnowFlake.SNOW_FLAKE.nextId();
     /**
      * 存储 Bar 的环形缓冲区
      */

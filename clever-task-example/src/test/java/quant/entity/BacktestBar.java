@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 回测bar数据
@@ -18,7 +19,7 @@ public class BacktestBar {
      */
     private Long id;
     /**
-     * 回撤id
+     * 回测id
      */
     private Long backtestRecordId;
     /**
@@ -60,7 +61,7 @@ public class BacktestBar {
     /**
      * 扩展数据
      */
-    private String extData;
+    private Map<String, Object> extData;
     /**
      * 创建时间
      */

@@ -1,5 +1,6 @@
 package org.clever.quant;
 
+import lombok.Getter;
 import org.clever.core.Assert;
 
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Map;
  * 作者：lizw <br/>
  * 创建时间：2026/03/04 13:22 <br/>
  */
+@Getter
 public abstract class AbstractExtData {
     /**
      * 其它扩展数据
