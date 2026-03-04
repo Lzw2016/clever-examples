@@ -2,10 +2,12 @@ package org.clever.quant;
 
 import lombok.extern.slf4j.Slf4j;
 import org.clever.core.Assert;
+import org.clever.core.Conv;
 import org.clever.core.DateUtils;
 import org.clever.core.RingBuffer;
 import org.clever.quant.utils.RingBufferUtils;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,9 +19,17 @@ import java.util.Objects;
  * 创建时间：2026/02/27 13:02 <br/>
  */
 @Slf4j
-public class BarSeries {
+public class BarSeries extends AbstractExtData {
     private static final int MIN_SLIDING_WINDOW = 8;
     private static final int DEF_SLIDING_WINDOW = 5120;
+    /**
+     * 最小持有天数
+     */
+    public static final String MIN_HOLDING_DAYS = "minHoldingDays";
+    /**
+     * 开盘日开始交易时间
+     */
+    public static final String TRADING_START_TIME = "tradingStartTime";
     /**
      * 存储 Bar 的环形缓冲区
      */
@@ -95,6 +105,51 @@ public class BarSeries {
      */
     public long getCount() {
         return buffer.totalCount();
+    }
+
+    /**
+     * 最小持有天数, 默认: 1 (T + 1)
+     */
+    public int getMinHoldingDays() {
+        final Integer defDays = 1;
+        return Conv.asInteger(getExtData(MIN_HOLDING_DAYS), defDays);
+    }
+
+    /**
+     * 最小持有天数
+     */
+    public void setMinHoldingDays(int minHoldingDays) {
+        Assert.isTrue(minHoldingDays >= 0, "参数 minHoldingDays 必须大于等于 0");
+        addExtData(MIN_HOLDING_DAYS, minHoldingDays);
+    }
+
+    /**
+     * 开盘日开始交易时间, 如: 09:30:00
+     */
+    public String getTradingStartTime() {
+        final String defTime = "09:30:00";
+        String tradingStartTime = Conv.asString(getExtData(TRADING_START_TIME), defTime);
+        try {
+            LocalTime.parse(tradingStartTime);
+            return tradingStartTime;
+        } catch (Exception e) {
+            return defTime;
+        }
+    }
+
+    /**
+     * 开盘日开始交易时间
+     *
+     * @param tradingStartTime 时间, 如: 09:30:00
+     */
+    public void setTradingStartTime(String tradingStartTime) {
+        Assert.isNotBlank(tradingStartTime, "参数 tradingStartTime 不能为空");
+        try {
+            LocalTime.parse(tradingStartTime);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("参数 tradingStartTime 格式错误, 必须是 09:30:00 格式");
+        }
+        addExtData(TRADING_START_TIME, tradingStartTime);
     }
 
     /**

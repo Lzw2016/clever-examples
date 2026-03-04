@@ -98,12 +98,12 @@ public class TradeUtils {
     /**
      * 计算如果开仓当前 Bar 之后的平仓时间
      */
-    public static Date calcUnlockTime(Bar bar) {
-        Assert.notNull(bar, "参数 bar 不能为 null");
-        int days = bar.getMinHoldingDays();
+    public static Date calcUnlockTime(BarSeries barSeries, Bar bar) {
+        Assert.notNull(barSeries, "参数 barSeries 不能为 null");
+        int days = barSeries.getMinHoldingDays();
         Date date = DateUtils.addDays(bar.getTime(), days);
         return DateUtils.parseDate(
-            DateUtils.formatToString(date, DateUtils.yyyy_MM_dd) + " " + bar.getTradingStartTime(),
+            DateUtils.formatToString(date, DateUtils.yyyy_MM_dd) + " " + barSeries.getTradingStartTime(),
             DateUtils.yyyy_MM_dd_HH_mm_ss
         );
     }

@@ -123,7 +123,7 @@ public abstract class AbstractAccount implements Account {
             Assert.isTrue(this.balance >= 0, String.format("开仓之后 balance 不能小于 0, balance=%s", String.format("%.4f", this.balance)));
             // 更新持仓状态
             Position position = positions.computeIfAbsent(bar.getCode(), Position::new);
-            position.increase(volume, price, fee, TradeUtils.calcUnlockTime(bar));
+            position.increase(volume, price, fee, TradeUtils.calcUnlockTime(barSeries, bar));
             //  增加历史记录
             tradeLogs.add(tradeLog);
             return tradeLog;

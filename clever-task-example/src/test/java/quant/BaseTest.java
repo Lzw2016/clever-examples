@@ -100,9 +100,9 @@ public class BaseTest {
     @Test
     public void t03() {
         BarSeries barSeries = new BarSeries();
-        ClosePriceIndicator closePrice = new ClosePriceIndicator(barSeries);
-        SMAIndicator sma10 = new SMAIndicator(closePrice, 10);
-        SMAIndicator sma30 = new SMAIndicator(closePrice, 30);
+        Indicator<Double> closePrice = new ClosePriceIndicator(barSeries);
+        Indicator<Double> sma10 = new SMAIndicator(closePrice, 10);
+        Indicator<Double> sma30 = new SMAIndicator(closePrice, 30);
         Rule entryRule = new CrossedUpIndicatorRule(sma30, sma10);
         Rule exitRule = new CrossedDownIndicatorRule(sma30, sma10);
         Strategy strategy = new BaseStrategy(entryRule, exitRule, "均线相交策略");
