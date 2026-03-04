@@ -117,6 +117,20 @@ public class Bar {
     }
 
     /**
+     * 开盘日开始交易时间, 如: 09:30:00
+     */
+    public String getTradingStartTime() {
+        final String defTime = "09:30:00";
+        String tradingStartTime = Conv.asString(getExtData(TRADING_START_TIME), defTime);
+        try {
+            LocalTime.parse(tradingStartTime);
+            return tradingStartTime;
+        } catch (Exception e) {
+            return defTime;
+        }
+    }
+
+    /**
      * 开盘日开始交易时间
      *
      * @param tradingStartTime 时间, 如: 09:30:00
@@ -129,19 +143,5 @@ public class Bar {
             throw new IllegalArgumentException("参数 tradingStartTime 格式错误, 必须是 09:30:00 格式");
         }
         addExtData(TRADING_START_TIME, tradingStartTime);
-    }
-
-    /**
-     * 开盘日开始交易时间, 如: 09:30:00
-     */
-    public String getTradingStartTime() {
-        final String defTime = "09:30:00";
-        String tradingStartTime = Conv.asString(getExtData(TRADING_START_TIME), defTime);
-        try {
-            LocalTime.parse(tradingStartTime);
-            return tradingStartTime;
-        } catch (Exception e) {
-            return defTime;
-        }
     }
 }
