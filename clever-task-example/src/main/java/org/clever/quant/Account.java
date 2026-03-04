@@ -18,7 +18,7 @@ public interface Account {
     /**
      * 初始总金额
      */
-    double getTotalAmount();
+    double getInitAmount();
 
     /**
      * 账户余额

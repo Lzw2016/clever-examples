@@ -31,7 +31,7 @@ public abstract class AbstractAccount implements Account {
     /**
      * 初始总金额
      */
-    protected final double totalAmount;
+    protected final double initAmount;
     /**
      * 账户余额
      */
@@ -46,14 +46,14 @@ public abstract class AbstractAccount implements Account {
     protected final List<TradeLog> tradeLogs = new ArrayList<>();
 
     /**
-     * @param totalAmount 初始总金额
-     * @param name        账户名
+     * @param initAmount 初始总金额
+     * @param name       账户名
      */
-    public AbstractAccount(double totalAmount, String name) {
-        Assert.isTrue(totalAmount > 0, "参数 totalAmount 必须大于等于0");
+    public AbstractAccount(double initAmount, String name) {
+        Assert.isTrue(initAmount > 0, "参数 initAmount 必须大于等于0");
         this.name = name == null ? getClass().getSimpleName() : name;
-        this.totalAmount = totalAmount;
-        this.balance = totalAmount;
+        this.initAmount = initAmount;
+        this.balance = initAmount;
     }
 
     @Override

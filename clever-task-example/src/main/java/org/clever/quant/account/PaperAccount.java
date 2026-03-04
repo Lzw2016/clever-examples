@@ -13,18 +13,18 @@ import org.clever.quant.TradeType;
  */
 public class PaperAccount extends AbstractAccount {
     /**
-     * @param totalAmount 初始总金额
+     * @param initAmount 初始总金额
      */
-    public PaperAccount(double totalAmount) {
-        this(totalAmount, null);
+    public PaperAccount(double initAmount) {
+        this(initAmount, null);
     }
 
     /**
-     * @param totalAmount 初始总金额
-     * @param name        账户名
+     * @param initAmount 初始总金额
+     * @param name       账户名
      */
-    public PaperAccount(double totalAmount, String name) {
-        super(totalAmount, name);
+    public PaperAccount(double initAmount, String name) {
+        super(initAmount, name);
     }
 
     @Override
