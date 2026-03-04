@@ -105,7 +105,8 @@ public class Bar {
      * 最小持有天数, 默认: 1 (T + 1)
      */
     public int getMinHoldingDays() {
-        return Conv.asInteger(getExtData(MIN_HOLDING_DAYS), 1);
+        final Integer defDays = 1;
+        return Conv.asInteger(getExtData(MIN_HOLDING_DAYS), defDays);
     }
 
     /**
