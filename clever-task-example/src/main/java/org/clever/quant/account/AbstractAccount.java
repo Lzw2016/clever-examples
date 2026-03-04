@@ -117,9 +117,9 @@ public abstract class AbstractAccount implements Account {
                 fee
             );
             // 扣减余额
-            double amount = volume * price + fee;
+            double amount = volume * price;
             double balance = this.balance;
-            this.balance = balance - amount;
+            this.balance = balance - amount - fee;
             Assert.isTrue(this.balance >= 0, String.format("开仓之后 balance 不能小于 0, balance=%s", String.format("%.4f", this.balance)));
             // 更新持仓状态
             Position position = positions.computeIfAbsent(bar.getCode(), Position::new);
@@ -143,9 +143,9 @@ public abstract class AbstractAccount implements Account {
                 fee
             );
             //  增加余额
-            double amount = volume * price - fee;
+            double amount = volume * price;
             double balance = this.balance;
-            this.balance = balance + amount;
+            this.balance = balance + amount - fee;
             // 更新持仓状态
             Position position = positions.get(bar.getCode());
             Assert.notNull(position, String.format("未持仓当前品种“%s”无法平仓", bar.getCode()));

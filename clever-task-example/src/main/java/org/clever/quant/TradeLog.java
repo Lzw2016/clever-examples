@@ -75,6 +75,10 @@ public class TradeLog {
         this.fee = fee;
         this.price = price;
         this.volume = volume;
-        this.amount = price * volume + fee;
+        if (TradeType.BUY.equals(tradeType)) {
+            this.amount = price * volume + fee;
+        } else {
+            this.amount = price * volume - fee;
+        }
     }
 }
