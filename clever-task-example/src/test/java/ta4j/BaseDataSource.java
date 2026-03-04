@@ -1,7 +1,11 @@
 package ta4j;
 
 import com.zaxxer.hikari.HikariConfig;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.Admin;
+import org.apache.kafka.clients.admin.CreateTopicsResult;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -12,12 +16,16 @@ import org.clever.core.function.OneConsumer;
 import org.clever.data.jdbc.Jdbc;
 import ta4j.model.StockBarData;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * 作者：lizw <br/>
  * 创建时间：2026/02/21 12:23 <br/>
  */
+@Slf4j
 public class BaseDataSource {
     public static Jdbc createDorisJdbc() {
         HikariConfig hikariConfig = new HikariConfig();
@@ -93,5 +101,22 @@ public class BaseDataSource {
 
     public static KafkaConsumer<String, String> createKafkaConsumer(String groupId) {
         return createKafkaConsumer(groupId, null);
+    }
+
+    @SneakyThrows
+    public static void createTopic(Admin admin, String topic) {
+        Set<String> existingTopics = admin.listTopics().names().get();
+        if (!existingTopics.contains(topic)) {
+            NewTopic newTopic = new NewTopic(topic, 1, (short) 1);
+            newTopic.configs(new HashMap<>() {{
+                // 数据保留时间 3600000(1小时) | 21600000(6小时) | 43200000(12小时) | 86400000(1天) | 172800000(2天) | 604800000(7天)
+                put("retention.ms", "172800000");
+                put("cleanup.policy", "delete");
+                put("compression.type", "zstd");
+            }});
+            CreateTopicsResult result = admin.createTopics(Collections.singleton(newTopic));
+            result.all().get();
+            log.info("创建Topic成功: {}", topic);
+        }
     }
 }
