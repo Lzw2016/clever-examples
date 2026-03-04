@@ -41,6 +41,9 @@ public class Position {
      */
     private final Map<Date, Integer> lockVolumes = new ConcurrentHashMap<>();
 
+    /**
+     * @param code 金融产品编码
+     */
     public Position(String code) {
         Assert.isNotBlank(code, "参数 code 不能为空");
         this.code = code;
@@ -65,10 +68,10 @@ public class Position {
     public synchronized int unlockVolumes(Date unlockTime) {
         Assert.notNull(unlockTime, "参数 unlockTime 不能为 null");
         int unlockedVolume = lockVolumes.entrySet().stream()
-            .filter(entry -> !entry.getKey().after(unlockTime))
+            .filter(entry -> entry.getKey().compareTo(unlockTime) <= 0)
             .mapToInt(Map.Entry::getValue)
             .sum();
-        lockVolumes.entrySet().removeIf(entry -> !entry.getKey().after(unlockTime));
+        lockVolumes.entrySet().removeIf(entry -> entry.getKey().compareTo(unlockTime) <= 0);
         availableVolume = availableVolume + unlockedVolume;
         return availableVolume;
     }

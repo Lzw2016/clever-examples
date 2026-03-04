@@ -18,11 +18,17 @@ public class LiveAccount extends AbstractAccount {
 
     @Override
     public TradeLog enter(BarSeries barSeries, Bar bar, long barIdx, double price, int volume, double fee) {
-        return null;
+        return syncWrite(() -> {
+            // TODO 调用QMT交易下单接口完成下单交易
+            return super.enter(barSeries, bar, barIdx, price, volume, fee);
+        });
     }
 
     @Override
     public TradeLog exit(BarSeries barSeries, Bar bar, long barIdx, double price, int volume, double fee) {
-        return null;
+        return syncWrite(() -> {
+            // TODO 调用QMT交易下单接口完成下单交易
+            return super.exit(barSeries, bar, barIdx, price, volume, fee);
+        });
     }
 }
