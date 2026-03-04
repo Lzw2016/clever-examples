@@ -1,5 +1,7 @@
 package org.clever.quant.rules;
 
+import lombok.Getter;
+import org.clever.core.id.SnowFlake;
 import org.clever.quant.BarSeries;
 import org.clever.quant.Indicator;
 import org.clever.quant.Rule;
@@ -16,6 +18,8 @@ import java.util.Set;
  */
 public abstract class AbstractRule implements Rule {
     protected final transient Logger log = LoggerFactory.getLogger(getClass());
+    @Getter
+    private final long id = SnowFlake.SNOW_FLAKE.nextId();
     protected final String name;
     protected final Set<BarSeries> allBarSeries = new HashSet<>();
 

@@ -34,9 +34,9 @@ public class BacktestIndicator {
      */
     private String name;
     /**
-     * 指标值类型
+     * 指标值类型(0: null, 1: number, 2: bool, 3: string, 4: object)
      */
-    private String valType;
+    private Integer valType;
     /**
      * 指标数值
      */
@@ -52,7 +52,7 @@ public class BacktestIndicator {
     /**
      * 指标对象值
      */
-    private String objVal;
+    private Object objVal;
     /**
      * 创建时间
      */

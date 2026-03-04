@@ -14,6 +14,10 @@ import java.util.Set;
  */
 public interface Rule {
     /**
+     * 规则实例id
+     */
+    long getId();
+    /**
      * 规则名称
      */
     String getName();

@@ -32,11 +32,11 @@ public class BacktestPositions {
     /**
      * 持有总量
      */
-    private Long volume;
+    private Integer volume;
     /**
      * 可用量
      */
-    private Long availableVolume;
+    private Integer availableVolume;
     /**
      * 平均成本价
      */

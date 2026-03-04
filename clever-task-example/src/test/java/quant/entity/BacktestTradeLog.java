@@ -44,7 +44,7 @@ public class BacktestTradeLog {
     /**
      * 成交量
      */
-    private Long volume;
+    private Integer volume;
     /**
      * 手续费(交易成本)
      */

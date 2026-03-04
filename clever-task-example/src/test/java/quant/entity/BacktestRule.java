@@ -34,9 +34,9 @@ public class BacktestRule {
      */
     private String name;
     /**
-     * 是否满足规则(0否 / 1是)
+     * 是否满足规则
      */
-    private Integer satisfied;
+    private Boolean satisfied;
     /**
      * 创建时间
      */
