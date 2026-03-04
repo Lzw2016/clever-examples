@@ -11,6 +11,11 @@ import java.util.Map;
  */
 public interface Account {
     /**
+     * 账户名称
+     */
+    String getName();
+
+    /**
      * 初始总金额
      */
     double getTotalAmount();

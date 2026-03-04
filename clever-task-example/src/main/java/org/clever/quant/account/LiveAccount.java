@@ -3,6 +3,7 @@ package org.clever.quant.account;
 import org.clever.quant.Bar;
 import org.clever.quant.BarSeries;
 import org.clever.quant.TradeLog;
+import org.clever.quant.TradeType;
 
 /**
  * 作者：lizw <br/>
@@ -20,7 +21,10 @@ public class LiveAccount extends AbstractAccount {
     public TradeLog enter(BarSeries barSeries, Bar bar, long barIdx, double price, int volume, double fee) {
         return syncWrite(() -> {
             // TODO 调用QMT交易下单接口完成下单交易
-            return super.enter(barSeries, bar, barIdx, price, volume, fee);
+            TradeLog tradeLog = new TradeLog(bar.getCode(), TradeType.BUY, barIdx, bar.getTime(), price, volume, fee);
+            super.increase(barSeries, bar, price, volume, fee);
+            tradeLogs.add(tradeLog);
+            return tradeLog;
         });
     }
 
@@ -28,7 +32,10 @@ public class LiveAccount extends AbstractAccount {
     public TradeLog exit(BarSeries barSeries, Bar bar, long barIdx, double price, int volume, double fee) {
         return syncWrite(() -> {
             // TODO 调用QMT交易下单接口完成下单交易
-            return super.exit(barSeries, bar, barIdx, price, volume, fee);
+            TradeLog tradeLog = new TradeLog(bar.getCode(), TradeType.SELL, barIdx, bar.getTime(), price, volume, fee);
+            super.decrease(bar.getCode(), price, volume, fee);
+            tradeLogs.add(tradeLog);
+            return tradeLog;
         });
     }
 }
