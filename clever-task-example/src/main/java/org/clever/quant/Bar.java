@@ -52,6 +52,4 @@ public class Bar extends AbstractExtData {
      * 成交额
      */
     private double amount;
-
-
 }
