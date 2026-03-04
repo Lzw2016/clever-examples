@@ -103,7 +103,7 @@ public class TradeUtils {
         int days = bar.getMinHoldingDays();
         Date date = DateUtils.addDays(bar.getTime(), days);
         return DateUtils.parseDate(
-            DateUtils.formatToString(date, DateUtils.yyyy_MM_dd) + " 09:30:00",
+            DateUtils.formatToString(date, DateUtils.yyyy_MM_dd) + " " + bar.getTradingStartTime(),
             DateUtils.yyyy_MM_dd_HH_mm_ss
         );
     }

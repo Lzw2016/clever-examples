@@ -5,6 +5,7 @@ import lombok.Data;
 import org.clever.core.Assert;
 import org.clever.core.Conv;
 
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,9 +20,13 @@ import java.util.Map;
 @Data
 public class Bar {
     /**
-     * 最小持有周期
+     * 最小持有天数
      */
     public static final String MIN_HOLDING_DAYS = "minHoldingDays";
+    /**
+     * 开盘日开始交易时间
+     */
+    public static final String TRADING_START_TIME = "tradingStartTime";
     /**
      * 金融产品编码
      */
@@ -97,17 +102,46 @@ public class Bar {
     }
 
     /**
-     * 最小持有周期, 默认: 1 (T + 1)
+     * 最小持有天数, 默认: 1 (T + 1)
      */
     public int getMinHoldingDays() {
         return Conv.asInteger(getExtData(MIN_HOLDING_DAYS), 1);
     }
 
     /**
-     * 最小持有周期
+     * 最小持有天数
      */
     public void setMinHoldingDays(int minHoldingDays) {
         Assert.isTrue(minHoldingDays >= 0, "参数 minHoldingDays 必须大于等于 0");
         addExtData(MIN_HOLDING_DAYS, minHoldingDays);
+    }
+
+    /**
+     * 开盘日开始交易时间
+     *
+     * @param tradingStartTime 时间, 如: 09:30:00
+     */
+    public void setTradingStartTime(String tradingStartTime) {
+        Assert.isNotBlank(tradingStartTime, "参数 tradingStartTime 不能为空");
+        try {
+            LocalTime.parse(tradingStartTime);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("参数 tradingStartTime 格式错误, 必须是 09:30:00 格式");
+        }
+        addExtData(TRADING_START_TIME, tradingStartTime);
+    }
+
+    /**
+     * 开盘日开始交易时间, 如: 09:30:00
+     */
+    public String getTradingStartTime() {
+        final String defTime = "09:30:00";
+        String tradingStartTime = Conv.asString(getExtData(TRADING_START_TIME), defTime);
+        try {
+            LocalTime.parse(tradingStartTime);
+            return tradingStartTime;
+        } catch (Exception e) {
+            return defTime;
+        }
     }
 }
