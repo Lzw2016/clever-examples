@@ -64,7 +64,7 @@ public class CrossedUpIndicatorRule extends AbstractRule {
         Assert.notNull(first, "参数 first 不能为 null");
         Assert.notNull(second, "参数 second 不能为 null");
         this.cross = new CrossIndicator(second, first);
-        addBarSeries(first, second);
+        dependencies(first, second);
     }
 
     @Override

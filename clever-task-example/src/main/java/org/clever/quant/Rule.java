@@ -17,10 +17,16 @@ public interface Rule {
      * 规则实例id
      */
     long getId();
+
     /**
      * 规则名称
      */
     String getName();
+
+    /**
+     * 返回当前规则依赖的指标集合
+     */
+    Set<Indicator<?>> getIndicators();
 
     /**
      * 返回与当前规则相关的所有 BarSeries 对象

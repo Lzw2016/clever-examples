@@ -21,6 +21,7 @@ public abstract class AbstractRule implements Rule {
     @Getter
     private final long id = SnowFlake.SNOW_FLAKE.nextId();
     protected final String name;
+    protected final Set<Indicator<?>> indicators = new HashSet<>();
     protected final Set<BarSeries> allBarSeries = new HashSet<>();
 
     public AbstractRule(String name) {
@@ -30,7 +31,20 @@ public abstract class AbstractRule implements Rule {
     /**
      * 增加与当前规则相关的 BarSeries
      */
-    protected void addBarSeries(BarSeries... barSeries) {
+    private void addIndicators(Indicator<?>... indicators) {
+        if (indicators != null) {
+            for (Indicator<?> item : indicators) {
+                if (item != null) {
+                    this.indicators.add(item);
+                }
+            }
+        }
+    }
+
+    /**
+     * 增加与当前规则相关的 BarSeries
+     */
+    private void addBarSeries(BarSeries... barSeries) {
         if (barSeries != null) {
             for (BarSeries item : barSeries) {
                 if (item != null) {
@@ -43,10 +57,11 @@ public abstract class AbstractRule implements Rule {
     /**
      * 增加与当前规则相关的 BarSeries, BarSeries从Rule对象中获取
      */
-    protected void addBarSeries(Rule... rules) {
+    protected void dependencies(Rule... rules) {
         if (rules != null) {
             for (Rule rule : rules) {
                 if (rule != null) {
+                    addIndicators(rule.getIndicators().toArray(new Indicator[0]));
                     addBarSeries(rule.getAllBarSeries().toArray(new BarSeries[0]));
                 }
             }
@@ -56,8 +71,9 @@ public abstract class AbstractRule implements Rule {
     /**
      * 增加与当前规则相关的 BarSeries, BarSeries从Indicator对象中获取
      */
-    protected void addBarSeries(Indicator<?>... indicators) {
+    protected void dependencies(Indicator<?>... indicators) {
         if (indicators != null) {
+            addIndicators(indicators);
             for (Indicator<?> indicator : indicators) {
                 if (indicator != null) {
                     addBarSeries(indicator.getBarSeries());
@@ -69,6 +85,11 @@ public abstract class AbstractRule implements Rule {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Set<Indicator<?>> getIndicators() {
+        return Collections.unmodifiableSet(indicators);
     }
 
     @Override
