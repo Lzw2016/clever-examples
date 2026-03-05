@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.clever.core.DateUtils;
+import org.clever.core.reflection.ReflectionsUtils;
 import org.clever.quant.*;
 import org.clever.quant.account.PaperAccount;
 import org.clever.quant.fee.StockTradeFeeStrategy;
@@ -102,6 +103,9 @@ public class BaseTest {
     @SneakyThrows
     @Test
     public void t03() {
+        Admin admin = BaseDataSource.createKafkaAdmin();
+        KafkaProducer<String, String> kafkaProducer = BaseDataSource.createKafkaProducer();
+
         BarSeries barSeries = new BarSeries();
         Indicator<Double> closePrice = new ClosePriceIndicator(barSeries);
         Indicator<Double> sma10 = new SMAIndicator(closePrice, 10);
@@ -113,8 +117,6 @@ public class BaseTest {
         Trader trader = new PaperTrader(account, strategy, new FullPositionStrategy(), new StockTradeFeeStrategy());
         trader.registerTradeListener(new TradeLogger());
         trader.start(barSeries);
-        Admin admin = BaseDataSource.createKafkaAdmin();
-        KafkaProducer<String, String> kafkaProducer = BaseDataSource.createKafkaProducer();
         BacktestArchiver backtestArchiver = new KafkaBacktestArchiver(
             "均线相交策略",
             "600998",
@@ -152,5 +154,14 @@ public class BaseTest {
         kafkaProducer.close();
         log.info("总资产: {}", String.format("%.2f", account.getTotalAssets(priceTable)));
         log.info("完成");
+    }
+
+    @Test
+    public void t05() {
+        BarSeries barSeries = new BarSeries();
+        Indicator<Double> closePrice = new ClosePriceIndicator(barSeries);
+        Indicator<Double> sma10 = new SMAIndicator(closePrice, 10);
+        Class<?> clazz = ReflectionsUtils.getClassGenericType(sma10.getClass());
+        log.info("--> {}", clazz.getName());
     }
 }

@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.clever.core.Assert;
 import org.clever.core.Conv;
 import org.clever.core.id.SnowFlake;
+import org.clever.core.reflection.ReflectionsUtils;
 import org.clever.quant.*;
 import org.clever.quant.account.TradeAccountSnapshot;
 import org.clever.quant.archive.entity.*;
@@ -238,22 +239,37 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         backtestIndicator.setBarSeriesId(barSeries.getId());
         backtestIndicator.setBarIdx(barIdx);
         backtestIndicator.setName(indicator.getClass().getSimpleName());
-        // TODO 使用反射获取指标值类型
+        // 使用反射获取指标值类型
+        Class<?> clazz = ReflectionsUtils.getClassGenericType(indicator.getClass());
         Object val = indicator.getValue(barIdx);
-        if (val == null) {
-            backtestIndicator.setValType(Constant.indicator_val_type_0);
-        } else if (val instanceof Number) {
+        if (Number.class.isAssignableFrom(clazz)) {
             backtestIndicator.setValType(Constant.indicator_val_type_1);
             backtestIndicator.setNumberVal(Conv.asDecimal(val, null));
-        } else if (val instanceof Boolean) {
+        } else if (Boolean.class.isAssignableFrom(clazz)) {
             backtestIndicator.setValType(Constant.indicator_val_type_2);
             backtestIndicator.setBoolVal(Conv.asBoolean(val, null));
-        } else if (val instanceof CharSequence) {
+        } else if (CharSequence.class.isAssignableFrom(clazz)) {
             backtestIndicator.setValType(Constant.indicator_val_type_3);
             backtestIndicator.setStringVal(Conv.asString(val, null));
-        } else {
+        } else if (!Object.class.equals(clazz)) {
             backtestIndicator.setValType(Constant.indicator_val_type_4);
             backtestIndicator.setObjVal(val);
+        } else {
+            if (val == null) {
+                backtestIndicator.setValType(Constant.indicator_val_type_0);
+            } else if (val instanceof Number) {
+                backtestIndicator.setValType(Constant.indicator_val_type_1);
+                backtestIndicator.setNumberVal(Conv.asDecimal(val, null));
+            } else if (val instanceof Boolean) {
+                backtestIndicator.setValType(Constant.indicator_val_type_2);
+                backtestIndicator.setBoolVal(Conv.asBoolean(val, null));
+            } else if (val instanceof CharSequence) {
+                backtestIndicator.setValType(Constant.indicator_val_type_3);
+                backtestIndicator.setStringVal(Conv.asString(val, null));
+            } else {
+                backtestIndicator.setValType(Constant.indicator_val_type_4);
+                backtestIndicator.setObjVal(val);
+            }
         }
         backtestIndicator.setCreateAt(new Date());
         backtestIndicator.setDelFlag(0);
