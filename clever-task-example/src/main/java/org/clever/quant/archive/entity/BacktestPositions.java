@@ -1,18 +1,18 @@
-package quant.entity;
+package org.clever.quant.archive.entity;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 /**
- * 回测策略数据
+ * 回测持仓数据
  * <p>
  * 作者：lizw <br/>
  * 创建时间：2026/03/04 10:00 <br/>
  */
 @Data
-public class BacktestStrategy {
+public class BacktestPositions {
     /**
      * 数据id
      */
@@ -22,25 +22,25 @@ public class BacktestStrategy {
      */
     private Long backtestRecordId;
     /**
-     * bar_series数据id集合
-     */
-    private List<Long> barSeriesIds;
-    /**
-     * 开仓规则id
-     */
-    private Long entryRuleId;
-    /**
-     * 平仓规则id
-     */
-    private Long exitRuleId;
-    /**
      * 指标对应的bar数据下标
      */
     private Long barIdx;
     /**
-     * 策略名称
+     * 金融产品编码
      */
-    private String name;
+    private String code;
+    /**
+     * 持有总量
+     */
+    private Integer volume;
+    /**
+     * 可用量
+     */
+    private Integer availableVolume;
+    /**
+     * 平均成本价
+     */
+    private BigDecimal avgCostPrice;
     /**
      * 创建时间
      */

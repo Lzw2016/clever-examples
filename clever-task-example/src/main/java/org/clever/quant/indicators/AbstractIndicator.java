@@ -2,10 +2,10 @@ package org.clever.quant.indicators;
 
 import org.clever.core.Assert;
 import org.clever.core.RingBuffer;
-import org.clever.quant.AbstractOneTimeBindableBarSeries;
 import org.clever.quant.Bar;
 import org.clever.quant.BarSeries;
 import org.clever.quant.Indicator;
+import org.clever.quant.series.AbstractOneTimeBindableBarSeries;
 import org.clever.quant.utils.RingBufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

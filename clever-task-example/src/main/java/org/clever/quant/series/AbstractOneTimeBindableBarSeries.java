@@ -1,6 +1,8 @@
-package org.clever.quant;
+package org.clever.quant.series;
 
 import org.clever.core.Assert;
+import org.clever.quant.BarSeries;
+import org.clever.quant.OneTimeBindableBarSeries;
 
 /**
  * 作者：lizw <br/>

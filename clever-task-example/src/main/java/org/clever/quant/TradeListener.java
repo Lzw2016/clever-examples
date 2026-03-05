@@ -1,5 +1,7 @@
 package org.clever.quant;
 
+import java.util.Set;
+
 /**
  * 发生实际交易时的监听
  * <p>
@@ -7,6 +9,16 @@ package org.clever.quant;
  * 创建时间：2026/03/02 13:26 <br/>
  */
 public interface TradeListener {
+    /**
+     * Bar 数据更新
+     *
+     * @param mainBar 交易的目标 Bar
+     * @param bars    辅助 Bar
+     * @param barIdx  Bar的索引位置
+     */
+    default void onBars(Bar mainBar, Set<Bar> bars, long barIdx) {
+    }
+
     /**
      * 开仓时回调通知
      *

@@ -1,5 +1,7 @@
 package org.clever.quant;
 
+import org.clever.quant.account.TradeAccountSnapshot;
+
 import java.util.List;
 import java.util.Map;
 

@@ -1,8 +1,9 @@
-package org.clever.quant;
+package org.clever.quant.account;
 
 import lombok.Builder;
 import lombok.Data;
 import org.clever.core.Assert;
+import org.clever.quant.Position;
 
 import java.util.Map;
 

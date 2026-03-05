@@ -1,18 +1,18 @@
-package quant.entity;
+package org.clever.quant.archive.entity;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 /**
- * 回测规则数据
+ * 回测账户快照
  * <p>
  * 作者：lizw <br/>
- * 创建时间：2026/03/04 21:11 <br/>
+ * 创建时间：2026/03/04 10:00 <br/>
  */
 @Data
-public class BacktestRule {
+public class BacktestAccountSnapshot {
     /**
      * 数据id
      */
@@ -22,21 +22,17 @@ public class BacktestRule {
      */
     private Long backtestRecordId;
     /**
-     * bar_series数据id集合
-     */
-    private List<Long> barSeriesIds;
-    /**
      * 指标对应的bar数据下标
      */
     private Long barIdx;
     /**
-     * 规则名称
+     * 账户余额
      */
-    private String name;
+    private BigDecimal balance;
     /**
-     * 是否满足规则
+     * 总资产
      */
-    private Boolean satisfied;
+    private BigDecimal totalAssets;
     /**
      * 创建时间
      */

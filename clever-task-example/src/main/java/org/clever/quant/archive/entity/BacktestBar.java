@@ -1,4 +1,4 @@
-package quant.entity;
+package org.clever.quant.archive.entity;
 
 import lombok.Data;
 

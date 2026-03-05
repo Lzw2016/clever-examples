@@ -1,4 +1,4 @@
-package quant.entity;
+package org.clever.quant.archive.entity;
 
 import lombok.Data;
 
@@ -6,13 +6,13 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 回测账户快照
+ * 回测交易日志
  * <p>
  * 作者：lizw <br/>
  * 创建时间：2026/03/04 10:00 <br/>
  */
 @Data
-public class BacktestAccountSnapshot {
+public class BacktestTradeLog {
     /**
      * 数据id
      */
@@ -26,13 +26,33 @@ public class BacktestAccountSnapshot {
      */
     private Long barIdx;
     /**
-     * 账户余额
+     * 金融产品编码
      */
-    private BigDecimal balance;
+    private String code;
     /**
-     * 总资产
+     * 交易类型
      */
-    private BigDecimal totalAssets;
+    private String tradeType;
+    /**
+     * 交易时间
+     */
+    private Date time;
+    /**
+     * 成交价
+     */
+    private BigDecimal price;
+    /**
+     * 成交量
+     */
+    private Integer volume;
+    /**
+     * 手续费(交易成本)
+     */
+    private BigDecimal fee;
+    /**
+     * 成交额
+     */
+    private BigDecimal amount;
     /**
      * 创建时间
      */

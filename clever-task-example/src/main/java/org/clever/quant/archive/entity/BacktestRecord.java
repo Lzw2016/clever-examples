@@ -1,4 +1,4 @@
-package quant.entity;
+package org.clever.quant.archive.entity;
 
 import lombok.Data;
 
@@ -22,7 +22,7 @@ public class BacktestRecord {
      */
     private String name;
     /**
-     * 回撤标签名
+     * 回测标签名
      */
     private String tag;
     /**

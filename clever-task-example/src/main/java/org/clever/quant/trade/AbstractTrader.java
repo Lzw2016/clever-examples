@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 作者：lizw <br/>
@@ -44,6 +45,10 @@ public abstract class AbstractTrader implements Trader, BarListener {
      * 交易的目标BarSeries
      */
     protected volatile BarSeries mainBarSeries;
+    /**
+     * 辅助 BarSeries
+     */
+    private volatile Set<BarSeries> auxBarSeries;
     /**
      * BarSeries的总数量
      */
@@ -110,17 +115,24 @@ public abstract class AbstractTrader implements Trader, BarListener {
     }
 
     @Override
-    public void start(BarSeries mainBarSeries) {
+    public synchronized void start(BarSeries mainBarSeries) {
         Assert.notNull(mainBarSeries, "参数 mainBarSeries 不能为 null");
         Assert.isNull(this.mainBarSeries, "不能重复调用 start");
         this.mainBarSeries = mainBarSeries;
         final Set<BarSeries> allBarSeries = new HashSet<>(strategy.getAllBarSeries());
+        allBarSeries.remove(mainBarSeries);
+        this.auxBarSeries = Collections.unmodifiableSet(allBarSeries);
         allBarSeries.add(mainBarSeries);
         this.barSeriesCount = allBarSeries.size();
         this.barIdxMap = new HashMap<>(barSeriesCount);
         for (BarSeries barSeries : allBarSeries) {
             barSeries.registerBarListener(this);
         }
+    }
+
+    @Override
+    public boolean isStarted() {
+        return this.mainBarSeries != null;
     }
 
     @Override
@@ -186,6 +198,8 @@ public abstract class AbstractTrader implements Trader, BarListener {
             nextBarEnter = enter;
             nextBarExit = exit;
         }
+        // Bar 数据更新
+        emitBarsEvent(mainBar, lastBarIdx);
     }
 
     /**
@@ -224,6 +238,23 @@ public abstract class AbstractTrader implements Trader, BarListener {
             return;
         }
         emitExitEvent(tradeLog, account);
+    }
+
+    /**
+     * Bar 数据更新
+     */
+    protected void emitBarsEvent(Bar mainBar, long barIdx) {
+        final Set<Bar> bars = this.auxBarSeries.stream()
+            .map(barSeries -> barSeries.getBar(barIdx))
+            .collect(Collectors.toSet());
+        for (TradeListener listener : listeners) {
+            try {
+                listener.onBars(mainBar, bars, barIdx);
+            } catch (Exception err) {
+                log.error("onBars事件回调异常, listener={}", listener, err);
+                // System.exit(-1);
+            }
+        }
     }
 
     /**

@@ -1,10 +1,10 @@
 package org.clever.quant.indicators.helpers;
 
 import org.clever.core.Assert;
-import org.clever.quant.AbstractOneTimeBindableBarSeries;
 import org.clever.quant.Bar;
 import org.clever.quant.BarSeries;
 import org.clever.quant.Indicator;
+import org.clever.quant.series.AbstractOneTimeBindableBarSeries;
 
 import java.util.Collections;
 import java.util.List;
