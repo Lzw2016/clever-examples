@@ -2,6 +2,7 @@ package quant;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.clever.core.DateUtils;
 import org.clever.quant.*;
@@ -16,7 +17,6 @@ import org.clever.quant.strategy.BaseStrategy;
 import org.clever.quant.trade.PaperTrader;
 import org.clever.quant.trade.TradeLogger;
 import org.junit.jupiter.api.Test;
-import ta4j.BaseDataSource;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -113,6 +113,7 @@ public class BaseTest {
         Trader trader = new PaperTrader(account, strategy, new FullPositionStrategy(), new StockTradeFeeStrategy());
         trader.registerTradeListener(new TradeLogger());
         trader.start(barSeries);
+        Admin admin = BaseDataSource.createKafkaAdmin();
         KafkaProducer<String, String> kafkaProducer = BaseDataSource.createKafkaProducer();
         BacktestArchiver backtestArchiver = new KafkaBacktestArchiver(
             "均线相交策略",
@@ -123,7 +124,9 @@ public class BaseTest {
             List.of(sma10, sma30),
             List.of(entryRule, exitRule),
             List.of(strategy),
-            kafkaProducer
+            admin,
+            kafkaProducer,
+            "quant_data"
         );
         backtestArchiver.start(trader);
         String stockCode = "600998.SH";
@@ -144,6 +147,8 @@ public class BaseTest {
             barSeries.appendBar(bar);
             priceTable.put(bar.getCode(), bar.getClose());
         });
+        backtestArchiver.end();
+        admin.close();
         kafkaProducer.close();
         log.info("总资产: {}", String.format("%.2f", account.getTotalAssets(priceTable)));
         log.info("完成");

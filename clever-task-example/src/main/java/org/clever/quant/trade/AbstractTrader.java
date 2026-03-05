@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -220,7 +221,7 @@ public abstract class AbstractTrader implements Trader, BarListener {
         if (tradeLog == null) {
             return;
         }
-        emitEnterEvent(tradeLog, account);
+        emitEnterEvent(tradeLog, account, barIdx);
     }
 
     /**
@@ -237,16 +238,19 @@ public abstract class AbstractTrader implements Trader, BarListener {
         if (tradeLog == null) {
             return;
         }
-        emitExitEvent(tradeLog, account);
+        emitExitEvent(tradeLog, account, barIdx);
     }
 
     /**
      * Bar 数据更新
      */
     protected void emitBarsEvent(Bar mainBar, long barIdx) {
-        final Set<Bar> bars = this.auxBarSeries.stream()
-            .map(barSeries -> barSeries.getBar(barIdx))
-            .collect(Collectors.toSet());
+        final Map<BarSeries, Bar> bars = Collections.unmodifiableMap(
+            this.auxBarSeries.stream().collect(
+                Collectors.toMap(Function.identity(),
+                    barSeries -> barSeries.getBar(barIdx))
+            )
+        );
         for (TradeListener listener : listeners) {
             try {
                 listener.onBars(mainBar, bars, barIdx);
@@ -260,10 +264,10 @@ public abstract class AbstractTrader implements Trader, BarListener {
     /**
      * 开仓事件
      */
-    protected void emitEnterEvent(TradeLog tradeLog, Account account) {
+    protected void emitEnterEvent(TradeLog tradeLog, Account account, long barIdx) {
         for (TradeListener listener : listeners) {
             try {
-                listener.onEnter(tradeLog, account);
+                listener.onEnter(tradeLog, account, barIdx);
             } catch (Exception err) {
                 log.error("onEnter事件回调异常, listener={}", listener, err);
                 // System.exit(-1);
@@ -274,10 +278,10 @@ public abstract class AbstractTrader implements Trader, BarListener {
     /**
      * 平仓事件
      */
-    protected void emitExitEvent(TradeLog tradeLog, Account account) {
+    protected void emitExitEvent(TradeLog tradeLog, Account account, long barIdx) {
         for (TradeListener listener : listeners) {
             try {
-                listener.onExit(tradeLog, account);
+                listener.onExit(tradeLog, account, barIdx);
             } catch (Exception err) {
                 log.error("onExit事件回调异常, listener={}", listener, err);
                 // System.exit(-1);

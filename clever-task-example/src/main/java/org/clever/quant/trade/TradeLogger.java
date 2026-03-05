@@ -13,7 +13,7 @@ import org.clever.quant.TradeLog;
 @Slf4j
 public class TradeLogger implements TradeListener {
     @Override
-    public void onEnter(TradeLog tradeLog, Account account) {
+    public void onEnter(TradeLog tradeLog, Account account, long barIdx) {
         log.info(
             "{} 买入 [{}] 价格:{} 成交量:{} 手续费:{} 成交额:{}",
             DateUtils.formatToString(tradeLog.getTime(), DateUtils.yyyy_MM_dd),
@@ -26,7 +26,7 @@ public class TradeLogger implements TradeListener {
     }
 
     @Override
-    public void onExit(TradeLog tradeLog, Account account) {
+    public void onExit(TradeLog tradeLog, Account account, long barIdx) {
         log.info(
             "{} 卖出 [{}] 价格:{} 成交量:{} 手续费:{} 成交额:{}",
             DateUtils.formatToString(tradeLog.getTime(), DateUtils.yyyy_MM_dd),

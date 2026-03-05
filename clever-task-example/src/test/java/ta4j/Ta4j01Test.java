@@ -29,6 +29,7 @@ import org.ta4j.core.num.DecimalNum;
 import org.ta4j.core.num.DecimalNumFactory;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.rules.*;
+import quant.BaseDataSource;
 
 import java.time.Duration;
 import java.time.ZoneId;
@@ -52,7 +53,7 @@ public class Ta4j01Test {
         Rule exitRule = new CrossedDownIndicatorRule(sma30, sma10);
         return new BaseStrategy("均线相交策略", entryRule, exitRule, 30);
     }
-    
+
     /**
      * 构建 ADX+DMI 策略
      *

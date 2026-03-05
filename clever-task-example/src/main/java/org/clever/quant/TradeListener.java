@@ -1,6 +1,6 @@
 package org.clever.quant;
 
-import java.util.Set;
+import java.util.Map;
 
 /**
  * 发生实际交易时的监听
@@ -16,7 +16,7 @@ public interface TradeListener {
      * @param bars    辅助 Bar
      * @param barIdx  Bar的索引位置
      */
-    default void onBars(Bar mainBar, Set<Bar> bars, long barIdx) {
+    default void onBars(Bar mainBar, Map<BarSeries, Bar> bars, long barIdx) {
     }
 
     /**
@@ -24,14 +24,16 @@ public interface TradeListener {
      *
      * @param tradeLog 交易日志
      * @param account  交易账户
+     * @param barIdx   Bar的索引位置
      */
-    void onEnter(TradeLog tradeLog, Account account);
+    void onEnter(TradeLog tradeLog, Account account, long barIdx);
 
     /**
      * 平仓时回调通知
      *
      * @param tradeLog 交易日志
      * @param account  交易账户
+     * @param barIdx   Bar的索引位置
      */
-    void onExit(TradeLog tradeLog, Account account);
+    void onExit(TradeLog tradeLog, Account account, long barIdx);
 }

@@ -1,4 +1,4 @@
-package ta4j;
+package quant;
 
 import com.zaxxer.hikari.HikariConfig;
 import lombok.SneakyThrows;

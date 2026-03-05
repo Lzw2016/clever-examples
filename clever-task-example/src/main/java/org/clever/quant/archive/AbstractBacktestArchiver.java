@@ -55,7 +55,7 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
      */
     private final Map<String, Double> priceTable = new ConcurrentHashMap<>();
     /**
-     *
+     * 交易对象
      */
     private volatile Trader trader;
 
@@ -106,45 +106,76 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         Assert.isNull(this.trader, "不能重复调用 start");
         this.trader = trader;
         trader.registerTradeListener(this);
+        saveData(backtestRecord);
+        saveData(backtestBarSeries);
     }
 
     @Override
     public synchronized void end() {
-        backtestRecord.setSuccess(true);
-        backtestRecord.setEndTime(new Date());
-        backtestRecord.setFinalTotalAssets(Conv.asDecimal(account.getTotalAssets(priceTable)));
-        backtestRecord.setMinTotalAssets(null);
-        backtestRecord.setProfitAmount(null);
-        backtestRecord.setTotalFee(null);
-        backtestRecord.setFeeRatio(null);
-        backtestRecord.setCumulativeReturnRate(null);
-        backtestRecord.setAvgAnnualReturnRate(null);
-        backtestRecord.setReturnVolatility(null);
-        backtestRecord.setMaxDrawdown(null);
-        backtestRecord.setLossStdDev(null);
-        backtestRecord.setMaxConsecutiveLossDays(null);
-        backtestRecord.setTotalTradeCount(null);
-        backtestRecord.setProfitTradeCount(null);
-        backtestRecord.setWinRate(null);
-        backtestRecord.setWinRate(null);
-        backtestRecord.setHoldingTimeP90(null);
-        backtestRecord.setMaxConsecutiveProfitCount(null);
-        backtestRecord.setMaxConsecutiveLossCount(null);
+        updateBacktestRecord(backtestRecord, account, priceTable);
+        saveData(backtestRecord);
+        saveData(backtestBarSeries);
     }
 
     @Override
-    public synchronized void onBars(Bar mainBar, Set<Bar> bars, long barIdx) {
-
+    public synchronized void onBars(Bar mainBar, Map<BarSeries, Bar> bars, long barIdx) {
+        final Set<Bar> allBar = new HashSet<>(bars.values());
+        allBar.add(mainBar);
+        for (Bar bar : allBar) {
+            priceTable.put(bar.getCode(), bar.getClose());
+        }
+        final Set<BacktestBar> backtestBars = bars.entrySet().stream()
+            .map(entry -> createBacktestBar(backtestRecord, entry.getKey(), entry.getValue(), barIdx))
+            .collect(Collectors.toSet());
+        saveData(backtestBars);
+        final Set<BacktestIndicator> backtestIndicators = indicators.stream()
+            .map(indicator -> createBacktestIndicator(backtestRecord, indicator.getBarSeries(), indicator, barIdx))
+            .collect(Collectors.toSet());
+        saveData(backtestIndicators);
+        final Set<BacktestRule> backtestRules = rules.stream()
+            .map(rule -> createBacktestRule(backtestRecord, account, rule, barIdx))
+            .collect(Collectors.toSet());
+        saveData(backtestRules);
+        final Set<BacktestStrategy> backtestStrategies = strategies.stream()
+            .map(strategy -> createBacktestStrategy(backtestRecord, strategy, barIdx))
+            .collect(Collectors.toSet());
+        saveData(backtestStrategies);
+        final TradeAccountSnapshot accountSnapshot = account.getSnapshot();
+        final BacktestAccountSnapshot backtestAccountSnapshot = createBacktestAccountSnapshot(backtestRecord, accountSnapshot, priceTable, barIdx);
+        saveData(backtestAccountSnapshot);
+        final List<BacktestPositions> backtestPositions = accountSnapshot.getPositions().values().stream()
+            .map(position -> createBacktestPositions(backtestRecord, position, barIdx))
+            .sorted(Comparator.comparing(BacktestPositions::getCode))
+            .toList();
+        saveData(backtestPositions);
     }
 
     @Override
-    public synchronized void onEnter(TradeLog tradeLog, Account account) {
-
+    public synchronized void onEnter(TradeLog tradeLog, Account account, long barIdx) {
+        final BacktestTradeLog backtestTradeLog = createBacktestTradeLog(backtestRecord, tradeLog, barIdx);
+        saveData(backtestTradeLog);
     }
 
     @Override
-    public synchronized void onExit(TradeLog tradeLog, Account account) {
+    public synchronized void onExit(TradeLog tradeLog, Account account, long barIdx) {
+        final BacktestTradeLog backtestTradeLog = createBacktestTradeLog(backtestRecord, tradeLog, barIdx);
+        saveData(backtestTradeLog);
+    }
 
+    /**
+     * 保存单个数据
+     */
+    protected abstract void saveData(Object data);
+
+    protected void saveData(Collection<?> datas) {
+        if (datas == null || datas.isEmpty()) {
+            return;
+        }
+        datas.forEach(this::saveData);
+    }
+
+    protected void saveData(Object[] datas) {
+        saveData(Arrays.asList(datas));
     }
 
     protected BacktestRecord createBacktestRecord(String name, String tag, Account account) {
@@ -165,6 +196,7 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         backtestBarSeries.setId(barSeries.getId());
         backtestBarSeries.setBacktestRecordId(backtestRecord.getId());
         backtestBarSeries.setMain(main);
+        // TODO createBacktestBarSeries
         backtestBarSeries.setSource(null);
         backtestBarSeries.setTableName(null);
         backtestBarSeries.setStartTime(null);
@@ -206,6 +238,7 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         backtestIndicator.setBarSeriesId(barSeries.getId());
         backtestIndicator.setBarIdx(barIdx);
         backtestIndicator.setName(indicator.getClass().getSimpleName());
+        // TODO 使用反射获取指标值类型
         Object val = indicator.getValue(barIdx);
         if (val == null) {
             backtestIndicator.setValType(Constant.indicator_val_type_0);
@@ -254,14 +287,13 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         return backtestStrategy;
     }
 
-    protected BacktestAccountSnapshot createBacktestAccountSnapshot(BacktestRecord backtestRecord, Account account, Map<String, Double> priceTable, long barIdx) {
+    protected BacktestAccountSnapshot createBacktestAccountSnapshot(BacktestRecord backtestRecord, TradeAccountSnapshot accountSnapshot, Map<String, Double> priceTable, long barIdx) {
         BacktestAccountSnapshot backtestAccountSnapshot = new BacktestAccountSnapshot();
         backtestAccountSnapshot.setId(SnowFlake.SNOW_FLAKE.nextId());
         backtestAccountSnapshot.setBacktestRecordId(backtestRecord.getId());
         backtestAccountSnapshot.setBarIdx(barIdx);
-        TradeAccountSnapshot snapshot = account.getSnapshot();
-        backtestAccountSnapshot.setBalance(Conv.asDecimal(snapshot.getBalance()));
-        backtestAccountSnapshot.setTotalAssets(Conv.asDecimal(snapshot.getTotalAssets(priceTable)));
+        backtestAccountSnapshot.setBalance(Conv.asDecimal(accountSnapshot.getBalance()));
+        backtestAccountSnapshot.setTotalAssets(Conv.asDecimal(accountSnapshot.getTotalAssets(priceTable)));
         backtestAccountSnapshot.setCreateAt(new Date());
         backtestAccountSnapshot.setDelFlag(0);
         return backtestAccountSnapshot;
@@ -296,5 +328,28 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         backtestTradeLog.setCreateAt(new Date());
         backtestTradeLog.setDelFlag(0);
         return backtestTradeLog;
+    }
+
+    protected void updateBacktestRecord(BacktestRecord backtestRecord, Account account, Map<String, Double> priceTable) {
+        backtestRecord.setSuccess(true);
+        backtestRecord.setEndTime(new Date());
+        backtestRecord.setFinalTotalAssets(Conv.asDecimal(account.getTotalAssets(priceTable)));
+        backtestRecord.setMinTotalAssets(null);
+        backtestRecord.setProfitAmount(null);
+        backtestRecord.setTotalFee(null);
+        backtestRecord.setFeeRatio(null);
+        backtestRecord.setCumulativeReturnRate(null);
+        backtestRecord.setAvgAnnualReturnRate(null);
+        backtestRecord.setReturnVolatility(null);
+        backtestRecord.setMaxDrawdown(null);
+        backtestRecord.setLossStdDev(null);
+        backtestRecord.setMaxConsecutiveLossDays(null);
+        backtestRecord.setTotalTradeCount(null);
+        backtestRecord.setProfitTradeCount(null);
+        backtestRecord.setWinRate(null);
+        backtestRecord.setWinRate(null);
+        backtestRecord.setHoldingTimeP90(null);
+        backtestRecord.setMaxConsecutiveProfitCount(null);
+        backtestRecord.setMaxConsecutiveLossCount(null);
     }
 }
