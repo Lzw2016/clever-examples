@@ -20,7 +20,11 @@ public class SMAIndicator extends AbstractIndicator<Double> {
     private final RollingSumIndicator previousSum;
 
     public SMAIndicator(Indicator<? extends Number> indicator, int barCount) {
-        super(indicator.getBarSeries(), barCount, false);
+        this(indicator, barCount, String.format("SMA%s", barCount));
+    }
+
+    public SMAIndicator(Indicator<? extends Number> indicator, int barCount, String name) {
+        super(indicator.getBarSeries(), barCount, false, name);
         Assert.isTrue(barCount > 0, "参数 barCount 必须大于0");
         this.indicator = indicator;
         this.previousSum = new RollingSumIndicator(indicator, barCount);

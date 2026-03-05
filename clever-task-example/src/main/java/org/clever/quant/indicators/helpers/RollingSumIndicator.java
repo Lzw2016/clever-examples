@@ -8,7 +8,7 @@ import org.clever.quant.indicators.AbstractIndicator;
 import java.util.List;
 
 /**
- * 计算指定指标的前n个周期内值的合
+ * 计算指定指标的前n个周期内值的和
  * <p>
  * 作者：lizw <br/>
  * 创建时间：2026/03/01 12:17 <br/>
@@ -22,7 +22,7 @@ public class RollingSumIndicator extends AbstractIndicator<Double> {
      * @param barCount  前n个周期内值的合
      */
     public RollingSumIndicator(Indicator<? extends Number> indicator, int barCount) {
-        super(indicator.getBarSeries(), barCount);
+        super(indicator.getBarSeries(), barCount, String.format("前%s个周期%s的和", barCount, indicator.getName()));
         Assert.isTrue(barCount > 0, "参数 barCount 必须大于0");
         this.indicator = indicator;
         this.barCount = barCount;

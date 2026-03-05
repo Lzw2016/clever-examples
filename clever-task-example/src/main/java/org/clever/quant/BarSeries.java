@@ -38,6 +38,11 @@ public class BarSeries extends AbstractExtData {
     @Getter
     private final long id = SnowFlake.SNOW_FLAKE.nextId();
     /**
+     * BarSeries 名称
+     */
+    @Getter
+    private final String name;
+    /**
      * 存储 Bar 的环形缓冲区
      */
     private final RingBuffer<Bar> buffer;
@@ -50,16 +55,25 @@ public class BarSeries extends AbstractExtData {
      */
     private volatile Bar lastBar;
 
+    public BarSeries() {
+        this(DEF_SLIDING_WINDOW, null);
+    }
+
     /**
      * @param slidingWindow 存储Bar的滑动窗口大小
      */
     public BarSeries(int slidingWindow) {
-        Assert.isTrue(slidingWindow >= MIN_SLIDING_WINDOW, String.format("参数 slidingWindow 必须大于等于 %s", MIN_SLIDING_WINDOW));
-        this.buffer = new RingBuffer<>(slidingWindow);
+        this(slidingWindow, null);
     }
 
-    public BarSeries() {
-        this(DEF_SLIDING_WINDOW);
+    /**
+     * @param slidingWindow 存储Bar的滑动窗口大小
+     * @param name          BarSeries 名称
+     */
+    public BarSeries(int slidingWindow, String name) {
+        Assert.isTrue(slidingWindow >= MIN_SLIDING_WINDOW, String.format("参数 slidingWindow 必须大于等于 %s", MIN_SLIDING_WINDOW));
+        this.name = name == null ? getClass().getSimpleName() : name;
+        this.buffer = new RingBuffer<>(slidingWindow);
     }
 
     /**

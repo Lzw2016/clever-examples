@@ -11,8 +11,10 @@ import org.clever.quant.indicators.AbstractIndicator;
  * 创建时间：2026/03/01 11:28 <br/>
  */
 public class VolumeIndicator extends AbstractIndicator<Long> {
+    private static final String DEF_NAME = "成交量";
+
     public VolumeIndicator(BarSeries series) {
-        super(series, 0);
+        super(series, 0, DEF_NAME);
     }
 
     @Override

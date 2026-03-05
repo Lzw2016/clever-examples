@@ -39,6 +39,11 @@ public class ConstantIndicator<T> extends AbstractOneTimeBindableBarSeries imple
     }
 
     @Override
+    public String getName() {
+        return "常量指标";
+    }
+
+    @Override
     public T getValue(long barIdx) {
         return value;
     }

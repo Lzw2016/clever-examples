@@ -19,6 +19,10 @@ import java.util.List;
 public abstract class AbstractIndicator<T> extends AbstractOneTimeBindableBarSeries implements Indicator<T> {
     protected final Logger log = LoggerFactory.getLogger(getClass());
     /**
+     * 指标名称
+     */
+    private final String name;
+    /**
      * 计算指标需要的最少 Bar 数据数量
      */
     protected final int unstableBarCount;
@@ -31,8 +35,8 @@ public abstract class AbstractIndicator<T> extends AbstractOneTimeBindableBarSer
      * @param series           指标绑定的 BarSeries
      * @param unstableBarCount 计算指标需要的最少 Bar 数据数量
      */
-    public AbstractIndicator(BarSeries series, int unstableBarCount) {
-        this(series, unstableBarCount, true);
+    public AbstractIndicator(BarSeries series, int unstableBarCount, String name) {
+        this(series, unstableBarCount, true, name);
     }
 
     /**
@@ -40,9 +44,10 @@ public abstract class AbstractIndicator<T> extends AbstractOneTimeBindableBarSer
      * @param unstableBarCount 计算指标需要的最少 Bar 数据数量
      * @param autoRegister     是否自动注册 BarSeries 监听
      */
-    public AbstractIndicator(BarSeries series, int unstableBarCount, boolean autoRegister) {
+    public AbstractIndicator(BarSeries series, int unstableBarCount, boolean autoRegister, String name) {
         Assert.notNull(series, "参数 series 不能为 null");
         Assert.isTrue(unstableBarCount >= 0, "参数 unstableBarCount 必须大于等于0");
+        this.name = name == null ? getClass().getSimpleName() : name;
         this.series = series;
         this.unstableBarCount = unstableBarCount;
         this.cache = new RingBuffer<>(series.getSlidingWindow());
@@ -67,6 +72,11 @@ public abstract class AbstractIndicator<T> extends AbstractOneTimeBindableBarSer
             return null;
         }
         return list.get(0);
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override

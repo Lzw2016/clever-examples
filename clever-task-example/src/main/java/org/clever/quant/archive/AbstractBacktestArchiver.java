@@ -203,7 +203,7 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         backtestBarSeries.setStartTime(null);
         backtestBarSeries.setEndTime(null);
         backtestBarSeries.setCode(null);
-        backtestBarSeries.setName(null);
+        backtestBarSeries.setName(barSeries.getName());
         backtestBarSeries.setPeriod(null);
         backtestBarSeries.setCount(null);
         backtestBarSeries.setSlidingWindow(barSeries.getSlidingWindow());
@@ -238,7 +238,7 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         backtestIndicator.setBacktestRecordId(backtestRecord.getId());
         backtestIndicator.setBarSeriesId(barSeries.getId());
         backtestIndicator.setBarIdx(barIdx);
-        backtestIndicator.setName(indicator.getClass().getSimpleName());
+        backtestIndicator.setName(indicator.getName());
         // 使用反射获取指标值类型
         Class<?> clazz = ReflectionsUtils.getClassGenericType(indicator.getClass());
         Object val = indicator.getValue(barIdx);

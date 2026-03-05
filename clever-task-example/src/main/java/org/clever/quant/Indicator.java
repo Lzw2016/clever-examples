@@ -10,6 +10,11 @@ import java.util.List;
  */
 public interface Indicator<T> extends BarListener, OneTimeBindableBarSeries {
     /**
+     * 指标名称
+     */
+    String getName();
+
+    /**
      * 获取指定 Bar 索引位置的指标数据
      *
      * @param barIdx Bar的索引位置

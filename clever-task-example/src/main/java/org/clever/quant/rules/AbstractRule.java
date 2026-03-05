@@ -23,10 +23,6 @@ public abstract class AbstractRule implements Rule {
     protected final String name;
     protected final Set<BarSeries> allBarSeries = new HashSet<>();
 
-    public AbstractRule() {
-        this(null);
-    }
-
     public AbstractRule(String name) {
         this.name = name == null ? getClass().getSimpleName() : name;
     }

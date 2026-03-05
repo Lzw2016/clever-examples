@@ -105,7 +105,6 @@ public class BaseTest {
     public void t03() {
         Admin admin = BaseDataSource.createKafkaAdmin();
         KafkaProducer<String, String> kafkaProducer = BaseDataSource.createKafkaProducer();
-
         BarSeries barSeries = new BarSeries();
         Indicator<Double> closePrice = new ClosePriceIndicator(barSeries);
         Indicator<Double> sma10 = new SMAIndicator(closePrice, 10);

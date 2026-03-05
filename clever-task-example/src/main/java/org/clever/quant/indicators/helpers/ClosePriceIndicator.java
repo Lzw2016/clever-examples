@@ -11,8 +11,10 @@ import org.clever.quant.indicators.AbstractIndicator;
  * 创建时间：2026/03/01 10:45 <br/>
  */
 public class ClosePriceIndicator extends AbstractIndicator<Double> {
+    private static final String DEF_NAME = "收盘价";
+
     public ClosePriceIndicator(BarSeries series) {
-        super(series, 0);
+        super(series, 0, DEF_NAME);
     }
 
     @Override

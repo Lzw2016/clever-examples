@@ -15,6 +15,7 @@ import java.util.Optional;
  * 创建时间：2026/03/01 20:03 <br/>
  */
 public class CrossedUpIndicatorRule extends AbstractRule {
+    private static final String DEF_NAME = "指标上穿(金叉)";
     /**
      * 判断指标是否交叉,监视两个指标是否交叉的指标
      */
@@ -27,7 +28,18 @@ public class CrossedUpIndicatorRule extends AbstractRule {
      * @param threshold 阈值常量
      */
     public CrossedUpIndicatorRule(Indicator<? extends Number> indicator, Number threshold) {
-        this(indicator, new ConstantIndicator<>(indicator.getBarSeries(), threshold));
+        this(indicator, new ConstantIndicator<>(indicator.getBarSeries(), threshold), DEF_NAME);
+    }
+
+    /**
+     * 规则满足: "指标"上穿"阈值常量"之时
+     *
+     * @param indicator 指标
+     * @param threshold 阈值常量
+     * @param name      规则名称
+     */
+    public CrossedUpIndicatorRule(Indicator<? extends Number> indicator, Number threshold, String name) {
+        this(indicator, new ConstantIndicator<>(indicator.getBarSeries(), threshold), name);
     }
 
     /**
@@ -37,6 +49,18 @@ public class CrossedUpIndicatorRule extends AbstractRule {
      * @param second second指标
      */
     public CrossedUpIndicatorRule(Indicator<? extends Number> first, Indicator<? extends Number> second) {
+        this(first, second, DEF_NAME);
+    }
+
+    /**
+     * 规则满足: first上穿second之时
+     *
+     * @param first  first指标
+     * @param second second指标
+     * @param name   规则名称
+     */
+    public CrossedUpIndicatorRule(Indicator<? extends Number> first, Indicator<? extends Number> second, String name) {
+        super(name);
         Assert.notNull(first, "参数 first 不能为 null");
         Assert.notNull(second, "参数 second 不能为 null");
         this.cross = new CrossIndicator(second, first);
