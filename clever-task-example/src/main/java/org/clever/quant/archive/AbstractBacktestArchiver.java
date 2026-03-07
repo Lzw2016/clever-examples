@@ -113,8 +113,21 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
 
     @Override
     public synchronized void end() {
+        // 更新 backtestRecord
         updateBacktestRecord(backtestRecord, account, priceTable);
         saveData(backtestRecord);
+        // 更新 backtestBarSeries
+        Set<BarSeries> allBarSeries = new HashSet<>(auxBarSeries);
+        allBarSeries.add(mainBarSeries);
+        for (BacktestBarSeries item : backtestBarSeries) {
+            BarSeries barSeries = allBarSeries.stream()
+                .filter(itm -> Objects.equals(item.getId(), itm.getId()))
+                .findFirst().orElse(null);
+            if (barSeries == null) {
+                continue;
+            }
+            updateBacktestBarSeries(item, barSeries);
+        }
         saveData(backtestBarSeries);
     }
 
@@ -197,15 +210,13 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         backtestBarSeries.setId(barSeries.getId());
         backtestBarSeries.setBacktestRecordId(backtestRecord.getId());
         backtestBarSeries.setMain(main);
-        // TODO createBacktestBarSeries
-        backtestBarSeries.setSource(null);
-        backtestBarSeries.setTableName(null);
-        backtestBarSeries.setStartTime(null);
-        backtestBarSeries.setEndTime(null);
-        backtestBarSeries.setCode(null);
+        backtestBarSeries.setSource(Conv.asString(barSeries.getExtData(BarSeries.EXT_SOURCE), null));
+        backtestBarSeries.setTableName(Conv.asString(barSeries.getExtData(BarSeries.EXT_TABLE_NAME), null));
+        backtestBarSeries.setStartTime(Conv.asDate(barSeries.getExtData(BarSeries.EXT_START_TIME), null));
+        backtestBarSeries.setEndTime(Conv.asDate(barSeries.getExtData(BarSeries.EXT_END_TIME), null));
+        backtestBarSeries.setCode(barSeries.getCode());
         backtestBarSeries.setName(barSeries.getName());
-        backtestBarSeries.setPeriod(null);
-        backtestBarSeries.setCount(null);
+        backtestBarSeries.setPeriod(Conv.asString(barSeries.getExtData(BarSeries.EXT_PERIOD), null));
         backtestBarSeries.setSlidingWindow(barSeries.getSlidingWindow());
         backtestBarSeries.setExtData(barSeries.getExtData());
         backtestBarSeries.setCreateAt(new Date());
@@ -367,5 +378,10 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         backtestRecord.setHoldingTimeP90(null);
         backtestRecord.setMaxConsecutiveProfitCount(null);
         backtestRecord.setMaxConsecutiveLossCount(null);
+    }
+
+    protected void updateBacktestBarSeries(BacktestBarSeries backtestBarSeries, BarSeries barSeries) {
+        backtestBarSeries.setCode(barSeries.getCode());
+        backtestBarSeries.setCount(barSeries.getCount());
     }
 }

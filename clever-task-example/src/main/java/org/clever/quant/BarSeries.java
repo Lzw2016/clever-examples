@@ -24,6 +24,11 @@ import java.util.Objects;
 public class BarSeries extends AbstractExtData {
     private static final int MIN_SLIDING_WINDOW = 8;
     private static final int DEF_SLIDING_WINDOW = 5120;
+    public static final String EXT_SOURCE = "source";
+    public static final String EXT_TABLE_NAME = "tableName";
+    public static final String EXT_START_TIME = "startTime";
+    public static final String EXT_END_TIME = "endTime";
+    public static final String EXT_PERIOD = "period";
     /**
      * 最小持有天数
      */
