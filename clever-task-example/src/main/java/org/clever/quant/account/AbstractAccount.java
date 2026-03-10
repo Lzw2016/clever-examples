@@ -29,7 +29,7 @@ public abstract class AbstractAccount implements Account {
      */
     protected final String name;
     /**
-     * 初始总金额
+     * 初始资金
      */
     protected final double initAmount;
     /**
@@ -46,7 +46,7 @@ public abstract class AbstractAccount implements Account {
     protected final List<TradeLog> tradeLogs = new ArrayList<>();
 
     /**
-     * @param initAmount 初始总金额
+     * @param initAmount 初始资金
      * @param name       账户名
      */
     public AbstractAccount(double initAmount, String name) {

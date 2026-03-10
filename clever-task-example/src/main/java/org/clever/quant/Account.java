@@ -1,7 +1,5 @@
 package org.clever.quant;
 
-import org.clever.quant.account.TradeAccountSnapshot;
-
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +16,7 @@ public interface Account {
     String getName();
 
     /**
-     * 初始总金额
+     * 初始资金
      */
     double getInitAmount();
 

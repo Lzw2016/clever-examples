@@ -40,7 +40,7 @@ public interface Trader {
     TradeFeeStrategy getTradeFeeStrategy();
 
     /**
-     * 注册交易监听器,用于监听 开仓/平仓 事件
+     * 注册交易监听器,用于监听“开仓/平仓”事件
      */
     void registerTradeListener(TradeListener listener);
 

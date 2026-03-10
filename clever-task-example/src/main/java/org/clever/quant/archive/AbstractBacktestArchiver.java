@@ -6,8 +6,8 @@ import org.clever.core.Conv;
 import org.clever.core.id.SnowFlake;
 import org.clever.core.reflection.ReflectionsUtils;
 import org.clever.quant.*;
-import org.clever.quant.account.TradeAccountSnapshot;
 import org.clever.quant.archive.entity.*;
+import org.clever.quant.criteria.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,6 +67,20 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
      * 最后一个 Bar 数据
      */
     private final Map<BarSeries, Bar> lastBars = new HashMap<>();
+    // 计算指标
+    private final HistoryMinTotalAssetsCriterion historyMinTotalAssets = new HistoryMinTotalAssetsCriterion();
+    private final ProfitAmountCriterion profitAmount = new ProfitAmountCriterion();
+    private final TotalFeeCriterion totalFee = new TotalFeeCriterion();
+    private final AvgAnnualReturnRateCriterion avgAnnualReturnRate = new AvgAnnualReturnRateCriterion();
+    private final ReturnVolatilityCriterion returnVolatility = new ReturnVolatilityCriterion();
+    private final HistoryMaxDrawdownCriterion maxDrawdown = new HistoryMaxDrawdownCriterion();
+    private final LossStdDevCriterion lossStdDev = new LossStdDevCriterion();
+    private final MaxConsecutiveLossDaysCriterion maxConsecutiveLossDays = new MaxConsecutiveLossDaysCriterion();
+    private final TotalTradeCountCriterion totalTradeCount = new TotalTradeCountCriterion();
+    private final ProfitTradeCountCriterion profitTradeCount = new ProfitTradeCountCriterion();
+    private final HoldingTimeP90Criterion holdingTimeP90 = new HoldingTimeP90Criterion();
+    private final MaxConsecutiveProfitCountCriterion maxConsecutiveProfitCount = new MaxConsecutiveProfitCountCriterion();
+    private final MaxConsecutiveLossCountCriterion maxConsecutiveLossCount = new MaxConsecutiveLossCountCriterion();
 
     /**
      * @param name          回测方案名称
@@ -115,6 +129,19 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         Assert.isNull(this.trader, "不能重复调用 start");
         this.trader = trader;
         trader.registerTradeListener(this);
+        historyMinTotalAssets.calculate(trader);
+        profitAmount.calculate(trader);
+        totalFee.calculate(trader);
+        avgAnnualReturnRate.calculate(trader);
+        returnVolatility.calculate(trader);
+        maxDrawdown.calculate(trader);
+        lossStdDev.calculate(trader);
+        maxConsecutiveLossDays.calculate(trader);
+        totalTradeCount.calculate(trader);
+        profitTradeCount.calculate(trader);
+        holdingTimeP90.calculate(trader);
+        maxConsecutiveProfitCount.calculate(trader);
+        maxConsecutiveLossCount.calculate(trader);
         saveData(backtestRecord);
         saveData(backtestBarSeries);
     }
@@ -372,24 +399,28 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
     protected void updateBacktestRecord(BacktestRecord backtestRecord, Account account, Map<String, Double> priceTable) {
         backtestRecord.setSuccess(true);
         backtestRecord.setEndTime(new Date());
-        backtestRecord.setFinalTotalAssets(Conv.asDecimal(account.getTotalAssets(priceTable)));
-        backtestRecord.setMinTotalAssets(null);
-        backtestRecord.setProfitAmount(null);
-        backtestRecord.setTotalFee(null);
-        backtestRecord.setFeeRatio(null);
-        backtestRecord.setCumulativeReturnRate(null);
-        backtestRecord.setAvgAnnualReturnRate(null);
-        backtestRecord.setReturnVolatility(null);
-        backtestRecord.setMaxDrawdown(null);
-        backtestRecord.setLossStdDev(null);
-        backtestRecord.setMaxConsecutiveLossDays(null);
-        backtestRecord.setTotalTradeCount(null);
-        backtestRecord.setProfitTradeCount(null);
-        backtestRecord.setWinRate(null);
-        backtestRecord.setWinRate(null);
-        backtestRecord.setHoldingTimeP90(null);
-        backtestRecord.setMaxConsecutiveProfitCount(null);
-        backtestRecord.setMaxConsecutiveLossCount(null);
+        double totalAssets = account.getTotalAssets(priceTable);
+        backtestRecord.setFinalTotalAssets(Conv.asDecimal(totalAssets));
+        backtestRecord.setMinTotalAssets(Conv.asDecimal(historyMinTotalAssets.getValue(), null));
+        backtestRecord.setProfitAmount(Conv.asDecimal(profitAmount.getValue(), null));
+        backtestRecord.setTotalFee(Conv.asDecimal(totalFee.getValue(), null));
+        if (profitAmount.getValue() > 0) {
+            backtestRecord.setFeeRatio(Conv.asDecimal(totalFee.getValue() / profitAmount.getValue() * 100));
+        }
+        backtestRecord.setCumulativeReturnRate(Conv.asDecimal((totalAssets - account.getInitAmount()) / account.getInitAmount() * 100));
+        backtestRecord.setAvgAnnualReturnRate(Conv.asDecimal(avgAnnualReturnRate.getValue(), null));
+        backtestRecord.setReturnVolatility(Conv.asDecimal(returnVolatility.getValue(), null));
+        backtestRecord.setMaxDrawdown(Conv.asDecimal(maxDrawdown.getValue(), null));
+        backtestRecord.setLossStdDev(Conv.asDecimal(lossStdDev.getValue(), null));
+        backtestRecord.setMaxConsecutiveLossDays(maxConsecutiveLossDays.getValue());
+        backtestRecord.setTotalTradeCount(totalTradeCount.getValue());
+        backtestRecord.setProfitTradeCount(profitTradeCount.getValue());
+        if (totalTradeCount.getValue() > 0) {
+            backtestRecord.setWinRate(Conv.asDecimal(profitTradeCount.getValue() * 1.0 / totalTradeCount.getValue() * 100.0));
+        }
+        backtestRecord.setHoldingTimeP90(Conv.asDecimal(holdingTimeP90.getValue(), null));
+        backtestRecord.setMaxConsecutiveProfitCount(maxConsecutiveProfitCount.getValue());
+        backtestRecord.setMaxConsecutiveLossCount(maxConsecutiveLossCount.getValue());
     }
 
     protected void updateBacktestBarSeries(BacktestBarSeries backtestBarSeries, BarSeries barSeries, Bar firstBar, Bar lastBar) {
