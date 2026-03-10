@@ -11,7 +11,7 @@ import org.clever.quant.indicators.AbstractIndicator;
  * 创建时间：2026/03/01 11:25 <br/>
  */
 public class AmountIndicator extends AbstractIndicator<Double> {
-    private static final String DEF_NAME = "成交额";
+    public static final String DEF_NAME = "成交额";
 
     public AmountIndicator(BarSeries series) {
         super(series, 0, DEF_NAME);

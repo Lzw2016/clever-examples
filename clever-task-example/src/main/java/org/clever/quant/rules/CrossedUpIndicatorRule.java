@@ -15,7 +15,7 @@ import java.util.Optional;
  * 创建时间：2026/03/01 20:03 <br/>
  */
 public class CrossedUpIndicatorRule extends AbstractRule {
-    private static final String DEF_NAME = "指标上穿(金叉)";
+    public static final String DEF_NAME = "指标上穿(金叉)";
     /**
      * 判断指标是否交叉,监视两个指标是否交叉的指标
      */

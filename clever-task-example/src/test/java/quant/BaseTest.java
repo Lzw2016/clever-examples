@@ -106,6 +106,8 @@ public class BaseTest {
         Admin admin = BaseDataSource.createKafkaAdmin();
         KafkaProducer<String, String> kafkaProducer = BaseDataSource.createKafkaProducer();
         BarSeries barSeries = new BarSeries();
+        barSeries.addExtData(BarSeries.EXT_SOURCE, "xtquant");
+        barSeries.addExtData(BarSeries.EXT_TABLE_NAME, "stock_1dk_bar");
         Indicator<Double> closePrice = new ClosePriceIndicator(barSeries);
         Indicator<Double> sma10 = new SMAIndicator(closePrice, 10);
         Indicator<Double> sma30 = new SMAIndicator(closePrice, 30);

@@ -59,6 +59,14 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
      * 交易对象
      */
     private volatile Trader trader;
+    /**
+     * 第一个 Bar 数据
+     */
+    private final Map<BarSeries, Bar> firstBars = new HashMap<>();
+    /**
+     * 最后一个 Bar 数据
+     */
+    private final Map<BarSeries, Bar> lastBars = new HashMap<>();
 
     /**
      * @param name          回测方案名称
@@ -126,13 +134,20 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
             if (barSeries == null) {
                 continue;
             }
-            updateBacktestBarSeries(item, barSeries);
+            updateBacktestBarSeries(item, barSeries, firstBars.get(barSeries), lastBars.get(barSeries));
         }
         saveData(backtestBarSeries);
     }
 
     @Override
     public synchronized void onBars(Bar mainBar, Map<BarSeries, Bar> bars, long barIdx) {
+        if (firstBars.isEmpty()) {
+            firstBars.putAll(bars);
+            firstBars.put(mainBarSeries, mainBar);
+        }
+        lastBars.clear();
+        lastBars.putAll(bars);
+        lastBars.put(mainBarSeries, mainBar);
         final Set<Bar> allBar = new HashSet<>(bars.values());
         allBar.add(mainBar);
         for (Bar bar : allBar) {
@@ -212,11 +227,8 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         backtestBarSeries.setMain(main);
         backtestBarSeries.setSource(Conv.asString(barSeries.getExtData(BarSeries.EXT_SOURCE), null));
         backtestBarSeries.setTableName(Conv.asString(barSeries.getExtData(BarSeries.EXT_TABLE_NAME), null));
-        backtestBarSeries.setStartTime(Conv.asDate(barSeries.getExtData(BarSeries.EXT_START_TIME), null));
-        backtestBarSeries.setEndTime(Conv.asDate(barSeries.getExtData(BarSeries.EXT_END_TIME), null));
         backtestBarSeries.setCode(barSeries.getCode());
         backtestBarSeries.setName(barSeries.getName());
-        backtestBarSeries.setPeriod(Conv.asString(barSeries.getExtData(BarSeries.EXT_PERIOD), null));
         backtestBarSeries.setSlidingWindow(barSeries.getSlidingWindow());
         backtestBarSeries.setExtData(barSeries.getExtData());
         backtestBarSeries.setCreateAt(new Date());
@@ -380,8 +392,15 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         backtestRecord.setMaxConsecutiveLossCount(null);
     }
 
-    protected void updateBacktestBarSeries(BacktestBarSeries backtestBarSeries, BarSeries barSeries) {
+    protected void updateBacktestBarSeries(BacktestBarSeries backtestBarSeries, BarSeries barSeries, Bar firstBar, Bar lastBar) {
         backtestBarSeries.setCode(barSeries.getCode());
         backtestBarSeries.setCount(barSeries.getCount());
+        if (firstBar != null) {
+            backtestBarSeries.setStartTime(firstBar.getTime());
+            backtestBarSeries.setPeriod(firstBar.getPeriod().getName());
+        }
+        if (lastBar != null) {
+            backtestBarSeries.setStartTime(lastBar.getTime());
+        }
     }
 }

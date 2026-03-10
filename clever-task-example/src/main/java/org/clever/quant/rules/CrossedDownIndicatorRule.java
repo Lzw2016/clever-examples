@@ -15,7 +15,7 @@ import java.util.Optional;
  * 创建时间：2026/03/01 20:52 <br/>
  */
 public class CrossedDownIndicatorRule extends AbstractRule {
-    private static final String DEF_NAME = "指标下穿(死叉)";
+    public static final String DEF_NAME = "指标下穿(死叉)";
     /**
      * 判断指标是否交叉,监视两个指标是否交叉的指标
      */
