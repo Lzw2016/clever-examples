@@ -9,7 +9,7 @@ import org.clever.quant.TradeLog;
 import java.util.Map;
 
 /**
- * 收益波动率
+ * 收益标准差
  * <p>
  * 作者：lizw <br/>
  * 创建时间：2026/03/10 22:28 <br/>

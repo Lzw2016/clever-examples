@@ -74,7 +74,7 @@ public class BacktestRecord {
      */
     private BigDecimal avgAnnualReturnRate;
     /**
-     * 收益波动率
+     * 收益标准差
      */
     private BigDecimal returnVolatility;
     /**
