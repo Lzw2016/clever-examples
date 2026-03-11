@@ -8,11 +8,11 @@ package org.clever.quant;
  */
 public interface AnalysisCriterion<T> {
     /**
-     * 开始计算策略指标
+     * 开始计算策略指标(只能调用一次)
      *
      * @param trader 交易账户(已经完成了所有交易之后)
      */
-    void calculate(Trader trader);
+    void startCalc(Trader trader);
 
     /**
      * 获取计算值

@@ -12,6 +12,10 @@ import org.clever.quant.Trader;
  */
 public abstract class AbstractAnalysisCriterion<T> implements AnalysisCriterion<T>, TradeListener {
     /**
+     * 是否已开始
+     */
+    protected volatile boolean started = false;
+    /**
      * 指标值
      */
     protected volatile T value;
@@ -21,8 +25,10 @@ public abstract class AbstractAnalysisCriterion<T> implements AnalysisCriterion<
     protected Account account;
 
     @Override
-    public void calculate(Trader trader) {
+    public synchronized void startCalc(Trader trader) {
         Assert.notNull(trader, "参数 trader 不能为 null");
+        Assert.isFalse(started, "不能重复调用 startCalc");
+        started = true;
         account = trader.getAccount();
         if (value == null) {
             value = getInitValue(account);
