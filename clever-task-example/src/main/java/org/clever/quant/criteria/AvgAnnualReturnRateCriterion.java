@@ -42,6 +42,9 @@ public class AvgAnnualReturnRateCriterion extends PriceTableAnalysisCriterion<Do
 
     @Override
     public Double getValue() {
+        if (firstBar == null) {
+            return value;
+        }
         double totalAssets = account.getTotalAssets(priceTable);
         double returnRate = (totalAssets - account.getInitAmount()) / account.getInitAmount() * 100;
         int years = DateUtils.pastYears(firstBar.getTime(), lastBar.getTime()) + 1;

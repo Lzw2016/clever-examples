@@ -1,6 +1,7 @@
 package quant;
 
 import com.zaxxer.hikari.HikariConfig;
+import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.Admin;
@@ -13,18 +14,17 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.clever.core.function.OneConsumer;
+import org.clever.core.function.ThreeConsumer;
 import org.clever.data.jdbc.Jdbc;
 import ta4j.model.StockBarData;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 作者：lizw <br/>
  * 创建时间：2026/02/21 12:23 <br/>
  */
+@SuppressWarnings("StringBufferReplaceableByString")
 @Slf4j
 public class BaseDataSource {
     public static Jdbc createDorisJdbc() {
@@ -40,22 +40,19 @@ public class BaseDataSource {
         return new Jdbc(hikariConfig);
     }
 
-    public static void get1dkBar(String stockCode, OneConsumer<StockBarData> onBar) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("select * from xtquant.stock_1dk_bar ");
-        sql.append("where suspendFlag=0 ");
-        sql.append(String.format("and stock_code='%s' ", stockCode));
-        sql.append("order by time asc ");
-        // sql.append("limit 100");
-        try (Jdbc jdbc = createDorisJdbc()) {
-            jdbc.queryForCursor(
-                sql.toString(),
-                rowData -> {
-                    StockBarData data = rowData.getRowData(StockBarData.class);
-                    onBar.call(data);
-                }
-            );
-        }
+    public static Jdbc createJdbc() {
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        hikariConfig.setJdbcUrl("jdbc:mysql://192.168.1.201:9030/xtquant");
+        hikariConfig.setUsername("admin");
+        hikariConfig.setPassword("admin123456");
+        hikariConfig.setAutoCommit(false);
+        hikariConfig.setMinimumIdle(1);
+        hikariConfig.setMaximumPoolSize(512);
+        Jdbc jdbc = new Jdbc(hikariConfig);
+        // 必须明确设置为 Integer.MIN_VALUE --> Cursor 有效的关键!
+        jdbc.getJdbcTemplate().getJdbcTemplate().setFetchSize(Integer.MIN_VALUE);
+        return jdbc;
     }
 
     private static Properties getKafkaCommonProps() {
@@ -118,5 +115,64 @@ public class BaseDataSource {
             result.all().get();
             log.info("创建Topic成功: {}", topic);
         }
+    }
+
+    public static void backtest(ThreeConsumer<Jdbc, Admin, KafkaProducer<String, String>> threeConsumer) {
+        try (
+            // Jdbc jdbc = BaseDataSource.createDorisJdbc();
+            Jdbc jdbc = BaseDataSource.createJdbc();
+            Admin admin = BaseDataSource.createKafkaAdmin();
+            KafkaProducer<String, String> kafkaProducer = BaseDataSource.createKafkaProducer()
+        ) {
+            threeConsumer.call(jdbc, admin, kafkaProducer);
+        } catch (Exception err) {
+            log.error("回测失败", err);
+        }
+    }
+
+    @Data
+    public static class StockSymbol {
+        private String code;
+        private String name;
+    }
+
+    public static List<StockSymbol> getAllStockSymbols(Jdbc jdbc) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("select distinct ");
+        sql.append("    a.stock_code as code, ");
+        sql.append("    b.InstrumentName as name ");
+        sql.append("from xtquant.stock_sector a left join xtquant.instrument_info b on (a.stock_code=concat(b.ExchangeCode, '.', b.ExchangeID)) ");
+        sql.append("where a.sector_name in ('沪深A股', '沪深ETF') ");
+        sql.append("  and length(a.stock_code) > 3 ");
+        sql.append("  and b.InstrumentName not like '%ST%' ");
+        sql.append("  and b.OpenDate < current_date() - interval 3 year ");
+        sql.append("order by a.stock_code ");
+        return jdbc.queryMany(sql.toString(), StockSymbol.class);
+    }
+
+    private static StringBuilder get1dkBarSQL(String stockCode) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("select * from xtquant.stock_1dk_bar ");
+        sql.append("where suspendFlag=0 ");
+        sql.append(String.format("and stock_code='%s' ", stockCode));
+        sql.append("order by time asc ");
+        // sql.append("limit 100");
+        return sql;
+    }
+
+    public static long get1dkBarCount(Jdbc jdbc, String stockCode) {
+        StringBuilder sql = get1dkBarSQL(stockCode);
+        return jdbc.queryCount(sql.toString());
+    }
+
+    public static void get1dkBar(Jdbc jdbc, String stockCode, OneConsumer<StockBarData> onBar) {
+        StringBuilder sql = get1dkBarSQL(stockCode);
+        jdbc.queryForCursor(
+            sql.toString(),
+            rowData -> {
+                StockBarData data = rowData.getRowData(StockBarData.class);
+                onBar.call(data);
+            }
+        );
     }
 }

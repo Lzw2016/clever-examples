@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.clever.core.DateUtils;
-import org.clever.core.reflection.ReflectionsUtils;
+import org.clever.data.jdbc.Jdbc;
 import org.clever.quant.*;
 import org.clever.quant.account.PaperAccount;
 import org.clever.quant.fee.StockTradeFeeStrategy;
@@ -81,8 +81,9 @@ public class BaseTest {
                 account.exit(barSeries, bar, barIdx, bar.getClose(), 1000, 5);
             }
         });
+        Jdbc jdbc = BaseDataSource.createDorisJdbc();
         String stockCode = "600998.SH";
-        BaseDataSource.get1dkBar(stockCode, stockBarData -> {
+        BaseDataSource.get1dkBar(jdbc, stockCode, stockBarData -> {
             Bar bar = Bar.builder()
                 .code(stockCode)
                 .period(Period._1d)
@@ -96,6 +97,7 @@ public class BaseTest {
                 .build();
             barSeries.appendBar(bar);
         });
+        jdbc.close();
         Thread.sleep(60_000);
         log.info("完成");
     }
@@ -103,8 +105,10 @@ public class BaseTest {
     @SneakyThrows
     @Test
     public void t03() {
+        Jdbc jdbc = BaseDataSource.createDorisJdbc();
         Admin admin = BaseDataSource.createKafkaAdmin();
         KafkaProducer<String, String> kafkaProducer = BaseDataSource.createKafkaProducer();
+
         BarSeries barSeries = new BarSeries();
         barSeries.addExtData(BarSeries.EXT_SOURCE, "xtquant");
         barSeries.addExtData(BarSeries.EXT_TABLE_NAME, "stock_1dk_bar");
@@ -135,7 +139,7 @@ public class BaseTest {
         String stockCode = "600998.SH";
         Map<String, Double> priceTable = new HashMap<>();
         log.info("初始资产: {}", String.format("%.2f", account.getTotalAssets(priceTable)));
-        BaseDataSource.get1dkBar(stockCode, stockBarData -> {
+        BaseDataSource.get1dkBar(jdbc, stockCode, stockBarData -> {
             Bar bar = Bar.builder()
                 .code(stockCode)
                 .period(Period._1d)
@@ -153,16 +157,70 @@ public class BaseTest {
         backtestArchiver.end();
         admin.close();
         kafkaProducer.close();
+        jdbc.close();
         log.info("总资产: {}", String.format("%.2f", account.getTotalAssets(priceTable)));
         log.info("完成");
     }
 
     @Test
     public void t05() {
-        BarSeries barSeries = new BarSeries();
-        Indicator<Double> closePrice = new ClosePriceIndicator(barSeries);
-        Indicator<Double> sma10 = new SMAIndicator(closePrice, 10);
-        Class<?> clazz = ReflectionsUtils.getClassGenericType(sma10.getClass());
-        log.info("--> {}", clazz.getName());
+        BaseDataSource.backtest((jdbc, admin, kafkaProducer) -> {
+            List<BaseDataSource.StockSymbol> allStockSymbols = BaseDataSource.getAllStockSymbols(jdbc);
+            int idx = 0;
+            for (BaseDataSource.StockSymbol stockSymbol : allStockSymbols) {
+                idx++;
+                log.info("{}/{} [{}]开始计算...", idx, allStockSymbols.size(), stockSymbol.getCode());
+                long count = BaseDataSource.get1dkBarCount(jdbc, stockSymbol.getCode());
+                if (count <= 0) {
+                    log.info("[{}] 没有数据跳过", stockSymbol.getCode());
+                    continue;
+                }
+                BarSeries barSeries = new BarSeries();
+                barSeries.addExtData(BarSeries.EXT_SOURCE, "xtquant");
+                barSeries.addExtData(BarSeries.EXT_TABLE_NAME, "stock_1dk_bar");
+                Indicator<Double> closePrice = new ClosePriceIndicator(barSeries);
+                Indicator<Double> sma10 = new SMAIndicator(closePrice, 10);
+                Indicator<Double> sma30 = new SMAIndicator(closePrice, 30);
+                Rule entryRule = new CrossedUpIndicatorRule(sma10, sma30);
+                Rule exitRule = new CrossedDownIndicatorRule(sma10, sma30);
+                Strategy strategy = new BaseStrategy(entryRule, exitRule, "均线相交");
+                Account account = new PaperAccount(10_0000);
+                Trader trader = new PaperTrader(account, strategy, new FullPositionStrategy(), new StockTradeFeeStrategy());
+                // trader.registerTradeListener(new TradeLogger());
+                trader.start(barSeries);
+                BacktestArchiver backtestArchiver = new KafkaBacktestArchiver(
+                    "均线相交(正向)",
+                    String.format("%s(%s)", stockSymbol.getCode(), stockSymbol.getName()),
+                    account,
+                    barSeries,
+                    new HashSet<>(),
+                    List.of(sma10, sma30),
+                    List.of(entryRule, exitRule),
+                    List.of(strategy),
+                    admin,
+                    kafkaProducer,
+                    "quant_data"
+                );
+                backtestArchiver.start(trader);
+                Map<String, Double> priceTable = new HashMap<>();
+                BaseDataSource.get1dkBar(jdbc, stockSymbol.getCode(), stockBarData -> {
+                    Bar bar = Bar.builder()
+                        .code(stockSymbol.getCode())
+                        .period(Period._1d)
+                        .time(stockBarData.getTime())
+                        .open(stockBarData.getOpen().doubleValue())
+                        .high(stockBarData.getHigh().doubleValue())
+                        .low(stockBarData.getLow().doubleValue())
+                        .close(stockBarData.getClose().doubleValue())
+                        .volume(stockBarData.getVolume())
+                        .amount(stockBarData.getAmount().doubleValue())
+                        .build();
+                    barSeries.appendBar(bar);
+                    priceTable.put(bar.getCode(), bar.getClose());
+                });
+                backtestArchiver.end();
+                log.info("[{}] 总资产: {}", stockSymbol.getCode(), String.format("%.2f", account.getTotalAssets(priceTable)));
+            }
+        });
     }
 }

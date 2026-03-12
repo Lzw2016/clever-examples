@@ -27,6 +27,8 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("com.oracle.database.jdbc:ojdbc8")
 
+    api("org.apache.commons:commons-math3:3.6.1")
+
     api("com.esotericsoftware:kryo:5.6.2")
     // api("net.openhft:chronicle-wire:2.27ea13")
     api("net.openhft:chronicle-queue:5.27ea11")

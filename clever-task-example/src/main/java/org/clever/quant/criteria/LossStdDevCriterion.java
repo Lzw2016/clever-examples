@@ -44,6 +44,9 @@ public class LossStdDevCriterion extends PriceTableAnalysisCriterion<Double> {
 
     @Override
     public Double getValue() {
+        if (stats.getN() <= 0) {
+            return value;
+        }
         value = stats.getStandardDeviation();
         return value;
     }

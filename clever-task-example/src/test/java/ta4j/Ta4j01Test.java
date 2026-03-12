@@ -3,6 +3,7 @@ package ta4j;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.clever.core.DateUtils;
+import org.clever.data.jdbc.Jdbc;
 import org.junit.jupiter.api.Test;
 import org.ta4j.core.*;
 import org.ta4j.core.analysis.EquityCurveMode;
@@ -114,9 +115,9 @@ public class Ta4j01Test {
             null,
             null
         );
-
+        Jdbc jdbc = BaseDataSource.createDorisJdbc();
         String stockCode = "600998.SH";
-        BaseDataSource.get1dkBar(stockCode, stockBarData -> {
+        BaseDataSource.get1dkBar(jdbc, stockCode, stockBarData -> {
             Bar bar = new TimeBarBuilder(DecimalNumFactory.getInstance())
                 .beginTime(stockBarData.getTime().toInstant())
                 .timePeriod(Duration.ofDays(1))
@@ -144,7 +145,7 @@ public class Ta4j01Test {
             // if (sma10.isStable() && sma30.isStable()) {
             // }
         });
-
+        jdbc.close();
         // 创建绩效分析器
         AnalysisCriterion netReturn = new NetReturnCriterion(ReturnRepresentation.DECIMAL);
         AnalysisCriterion maxDrawdown = new MaximumDrawdownCriterion(EquityCurveMode.MARK_TO_MARKET, OpenPositionHandling.MARK_TO_MARKET);
@@ -194,8 +195,9 @@ public class Ta4j01Test {
         BarSeries barSeries = new BaseBarSeriesBuilder()
             .withName("测试")
             .build();
+        Jdbc jdbc = BaseDataSource.createDorisJdbc();
         String stockCode = "600998.SH";
-        BaseDataSource.get1dkBar(stockCode, stockBarData -> {
+        BaseDataSource.get1dkBar(jdbc, stockCode, stockBarData -> {
             Bar bar = new TimeBarBuilder(DecimalNumFactory.getInstance())
                 .beginTime(stockBarData.getTime().toInstant())
                 .timePeriod(Duration.ofDays(1))
@@ -208,6 +210,7 @@ public class Ta4j01Test {
                 .build();
             barSeries.addBar(bar);
         });
+        jdbc.close();
         Strategy strategy = strategy00(barSeries);
         BarSeriesManager manager = new BarSeriesManager(
             barSeries,
