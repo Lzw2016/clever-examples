@@ -44,22 +44,4 @@ public class BaseStrategy implements Strategy {
     public Rule getExitRule() {
         return exitRule;
     }
-
-    @Override
-    public Strategy and(Strategy strategy, String name) {
-        return new BaseStrategy(
-            entryRule.and(strategy.getEntryRule()),
-            exitRule.and(strategy.getExitRule()),
-            name == null ? String.format("(%s and %s)", this.getName(), strategy.getName()) : name
-        );
-    }
-
-    @Override
-    public Strategy or(Strategy strategy, String name) {
-        return new BaseStrategy(
-            entryRule.or(strategy.getEntryRule()),
-            exitRule.or(strategy.getExitRule()),
-            name == null ? String.format("(%s or %s)", this.getName(), strategy.getName()) : name
-        );
-    }
 }

@@ -263,10 +263,4 @@ public class BarSeries extends AbstractExtData {
             }
         }
     }
-
-//    public int getFirst
-//    public int getLast
-
-//    public int getStart
-//    public int getEnd
 }

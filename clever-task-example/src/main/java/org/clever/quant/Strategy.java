@@ -66,16 +66,4 @@ public interface Strategy {
         Assert.notNull(exitRule, "exitRule 不能为 null");
         return exitRule.isSatisfied(barIdx, account);
     }
-
-    Strategy and(Strategy strategy, String name);
-
-    default Strategy and(Strategy strategy) {
-        return and(strategy, null);
-    }
-
-    Strategy or(Strategy strategy, String name);
-
-    default Strategy or(Strategy strategy) {
-        return or(strategy, null);
-    }
 }
