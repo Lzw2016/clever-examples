@@ -19,10 +19,7 @@ import org.clever.quant.trade.PaperTrader;
 import org.clever.quant.trade.TradeLogger;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 作者：lizw <br/>
@@ -32,7 +29,7 @@ import java.util.Map;
 public class BaseTest {
     @Test
     public void t01() {
-        BarSeries barSeries = new BarSeries(1_000);
+        BarSeries barSeries = new BarSeries(new ArrayList<>(), 1_000);
 
         Indicator<?> indicator_01 = null;
         Indicator<?> indicator_02 = null;
@@ -61,7 +58,7 @@ public class BaseTest {
     @SneakyThrows
     @Test
     public void t02() {
-        BarSeries barSeries = new BarSeries();
+        BarSeries barSeries = new BarSeries(new ArrayList<>());
         ClosePriceIndicator closePrice = new ClosePriceIndicator(barSeries);
         SMAIndicator sma10 = new SMAIndicator(closePrice, 10);
         SMAIndicator sma30 = new SMAIndicator(closePrice, 30);
@@ -71,14 +68,14 @@ public class BaseTest {
         Account account = new PaperAccount(10_0000);
         barSeries.registerBarListener((bar, barIdx) -> {
             String date = DateUtils.formatToString(bar.getTime(), DateUtils.yyyy_MM_dd);
-            String price = String.format("%.4f", bar.getClose());
+            String price = String.format("%.4f", bar.getClose(AdjustType.none));
             if (strategy.shouldEnter(barIdx, account)) {
                 log.info("买入 @ {} 价格: {}", date, price);
-                account.enter(barSeries, bar, barIdx, bar.getClose(), 1000, 5);
+                account.enter(barSeries, bar, barIdx, bar.getClose(AdjustType.none), 1000, 5);
             }
             if (strategy.shouldExit(barIdx, account)) {
                 log.info("卖出 @ {} 价格: {}", date, price);
-                account.exit(barSeries, bar, barIdx, bar.getClose(), 1000, 5);
+                account.exit(barSeries, bar, barIdx, bar.getClose(AdjustType.none), 1000, 5);
             }
         });
         Jdbc jdbc = BaseDataSource.createDorisJdbc();
@@ -109,7 +106,7 @@ public class BaseTest {
         Admin admin = BaseDataSource.createKafkaAdmin();
         KafkaProducer<String, String> kafkaProducer = BaseDataSource.createKafkaProducer();
 
-        BarSeries barSeries = new BarSeries();
+        BarSeries barSeries = new BarSeries(new ArrayList<>());
         barSeries.addExtData(BarSeries.EXT_SOURCE, "xtquant");
         barSeries.addExtData(BarSeries.EXT_TABLE_NAME, "stock_1dk_bar");
         Indicator<Double> closePrice = new ClosePriceIndicator(barSeries);
@@ -152,7 +149,7 @@ public class BaseTest {
                 .amount(stockBarData.getAmount().doubleValue())
                 .build();
             barSeries.appendBar(bar);
-            priceTable.put(bar.getCode(), bar.getClose());
+            priceTable.put(bar.getCode(), bar.getClose(AdjustType.none));
         });
         backtestArchiver.end();
         admin.close();
@@ -175,7 +172,7 @@ public class BaseTest {
                     log.info("[{}] 没有数据跳过", stockSymbol.getCode());
                     continue;
                 }
-                BarSeries barSeries = new BarSeries();
+                BarSeries barSeries = new BarSeries(new ArrayList<>());
                 barSeries.addExtData(BarSeries.EXT_SOURCE, "xtquant");
                 barSeries.addExtData(BarSeries.EXT_TABLE_NAME, "stock_1dk_bar");
                 Indicator<Double> closePrice = new ClosePriceIndicator(barSeries);
@@ -214,9 +211,10 @@ public class BaseTest {
                         .close(stockBarData.getClose().doubleValue())
                         .volume(stockBarData.getVolume())
                         .amount(stockBarData.getAmount().doubleValue())
+                        .adjustPriceCalc(null)
                         .build();
                     barSeries.appendBar(bar);
-                    priceTable.put(bar.getCode(), bar.getClose());
+                    priceTable.put(bar.getCode(), bar.getClose(AdjustType.none));
                 });
                 backtestArchiver.end();
                 log.info("[{}] 总资产: {}", stockSymbol.getCode(), String.format("%.2f", account.getTotalAssets(priceTable)));

@@ -178,7 +178,7 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         final Set<Bar> allBar = new HashSet<>(bars.values());
         allBar.add(mainBar);
         for (Bar bar : allBar) {
-            priceTable.put(bar.getCode(), bar.getClose());
+            priceTable.put(bar.getCode(), bar.getClose(AdjustType.none));
         }
         final Set<BacktestBar> backtestBars = bars.entrySet().stream()
             .map(entry -> createBacktestBar(backtestRecord, entry.getKey(), entry.getValue(), barIdx))
@@ -270,10 +270,10 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         backtestBar.setBarSeriesId(barSeries.getId());
         backtestBar.setBarIdx(barIdx);
         backtestBar.setTime(bar.getTime());
-        backtestBar.setOpen(Conv.asDecimal(bar.getOpen()));
-        backtestBar.setHigh(Conv.asDecimal(bar.getHigh()));
-        backtestBar.setLow(Conv.asDecimal(bar.getHigh()));
-        backtestBar.setClose(Conv.asDecimal(bar.getClose()));
+        backtestBar.setOpen(Conv.asDecimal(bar.getOpen(AdjustType.front)));
+        backtestBar.setHigh(Conv.asDecimal(bar.getHigh(AdjustType.front)));
+        backtestBar.setLow(Conv.asDecimal(bar.getHigh(AdjustType.front)));
+        backtestBar.setClose(Conv.asDecimal(bar.getClose(AdjustType.front)));
         backtestBar.setVolume(bar.getVolume());
         backtestBar.setAmount(Conv.asDecimal(bar.getAmount()));
         backtestBar.setExtData(bar.getExtData());

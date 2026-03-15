@@ -10,12 +10,10 @@ import org.clever.core.id.SnowFlake;
 import org.clever.quant.utils.RingBufferUtils;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
- * 的行情Bar时间序列数据
+ * 行情Bar的时间序列数据
  * <p>
  * 作者：lizw <br/>
  * 创建时间：2026/02/27 13:02 <br/>
@@ -49,6 +47,10 @@ public class BarSeries extends AbstractExtData {
      */
     private final RingBuffer<Bar> buffer;
     /**
+     * 所有的“分红配送”数据
+     */
+    private final LinkedList<Dividend> dividends;
+    /**
      * Bar 数据监听器列表
      */
     private final List<BarListener> listeners = new ArrayList<>();
@@ -57,25 +59,33 @@ public class BarSeries extends AbstractExtData {
      */
     private volatile Bar lastBar;
 
-    public BarSeries() {
-        this(DEF_SLIDING_WINDOW, null);
+    /**
+     * @param dividends 历史“分红配送”数据
+     */
+    public BarSeries(List<Dividend> dividends) {
+        this(dividends, DEF_SLIDING_WINDOW, null);
     }
 
     /**
+     * @param dividends     历史“分红配送”数据
      * @param slidingWindow 存储Bar的滑动窗口大小
      */
-    public BarSeries(int slidingWindow) {
-        this(slidingWindow, null);
+    public BarSeries(List<Dividend> dividends, int slidingWindow) {
+        this(dividends, slidingWindow, null);
     }
 
     /**
+     * @param dividends     历史“分红配送”数据
      * @param slidingWindow 存储Bar的滑动窗口大小
      * @param name          BarSeries 名称
      */
-    public BarSeries(int slidingWindow, String name) {
+    public BarSeries(List<Dividend> dividends, int slidingWindow, String name) {
+        Assert.notNull(dividends, "参数 dividends 不能为空");
         Assert.isTrue(slidingWindow >= MIN_SLIDING_WINDOW, String.format("参数 slidingWindow 必须大于等于 %s", MIN_SLIDING_WINDOW));
         this.name = name == null ? getClass().getSimpleName() : name;
         this.buffer = new RingBuffer<>(slidingWindow);
+        dividends.sort(Comparator.comparing(Dividend::getExDate));
+        this.dividends = new LinkedList<>(dividends);
     }
 
     /**
@@ -198,6 +208,13 @@ public class BarSeries extends AbstractExtData {
                     () -> String.format("bar的时间只能在%s之后", DateUtils.formatToString(lastBar.getTime()))
                 );
             }
+            // 处理“分红转送”
+            Dividend dividend = dividends.peek();
+            if (dividend != null && Objects.equals(DateUtils.formatToString(bar.getTime(), DateUtils.yyyy_MM_dd), DateUtils.formatToString(dividend.getExDate(), DateUtils.yyyy_MM_dd))) {
+                emitDividendEvent(dividend);
+                dividends.poll();
+            }
+            // 新增 bar 驱动交易
             long barIdx = buffer.add(bar, this::emitRemoveBarEvent);
             Assert.isTrue(barIdx >= 0, "追加 Bar 失败");
             lastBar = bar;
@@ -259,6 +276,20 @@ public class BarSeries extends AbstractExtData {
                 listener.onRemoveBar(bar, barIdx);
             } catch (Exception err) {
                 log.error("onRemoveBar事件回调异常, listener={}", listener, err);
+                // System.exit(-1);
+            }
+        }
+    }
+
+    /**
+     * 触发分红配送(除权除息)事件
+     */
+    protected void emitDividendEvent(Dividend dividend) {
+        for (BarListener listener : listeners) {
+            try {
+                listener.onDividendEvent(dividend);
+            } catch (Exception err) {
+                log.error("onDividendEvent事件回调异常, listener={}", listener, err);
                 // System.exit(-1);
             }
         }

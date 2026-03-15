@@ -24,4 +24,14 @@ public interface BarListener {
      */
     default void onRemoveBar(Bar bar, long barIdx) {
     }
+
+    /**
+     * 分红配送(除权除息)
+     * <p>
+     * 注意：该事件会在除权除息日对应的Bar处理完成后触发
+     *
+     * @param dividend 分红配送数据
+     */
+    default void onDividendEvent(Dividend dividend) {
+    }
 }

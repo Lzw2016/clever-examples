@@ -1,5 +1,6 @@
 package org.clever.quant.criteria;
 
+import org.clever.quant.AdjustType;
 import org.clever.quant.Bar;
 import org.clever.quant.BarSeries;
 
@@ -23,7 +24,7 @@ public abstract class PriceTableAnalysisCriterion<T> extends AbstractAnalysisCri
         final Set<Bar> allBar = new HashSet<>(bars.values());
         allBar.add(mainBar);
         for (Bar bar : allBar) {
-            priceTable.put(bar.getCode(), bar.getClose());
+            priceTable.put(bar.getCode(), bar.getClose(AdjustType.none));
         }
     }
 }

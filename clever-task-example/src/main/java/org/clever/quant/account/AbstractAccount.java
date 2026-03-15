@@ -119,6 +119,15 @@ public abstract class AbstractAccount implements Account {
         }
     }
 
+    /**
+     * 增持
+     *
+     * @param barSeries 行情Bar的时间序列数据
+     * @param bar       Bar数据
+     * @param price     撮合成交价
+     * @param volume    增加的持仓量
+     * @param fee       手续费(交易成本)
+     */
     public void increase(BarSeries barSeries, Bar bar, double price, int volume, double fee) {
         syncWrite(() -> {
             // 扣减余额
@@ -135,6 +144,11 @@ public abstract class AbstractAccount implements Account {
 
     /**
      * 减持
+     *
+     * @param code   金融产品编码
+     * @param price  撮合成交价
+     * @param volume 减少的持仓量
+     * @param fee    手续费(交易成本)
      */
     protected void decrease(String code, double price, int volume, double fee) {
         syncWrite(() -> {

@@ -1,5 +1,6 @@
 package org.clever.quant.indicators.helpers;
 
+import org.clever.quant.AdjustType;
 import org.clever.quant.Bar;
 import org.clever.quant.BarSeries;
 import org.clever.quant.indicators.AbstractIndicator;
@@ -19,6 +20,6 @@ public class OpenPriceIndicator extends AbstractIndicator<Double> {
 
     @Override
     protected Double calculate(Bar bar, long barIdx) {
-        return bar.getOpen();
+        return bar.getOpen(AdjustType.front);
     }
 }

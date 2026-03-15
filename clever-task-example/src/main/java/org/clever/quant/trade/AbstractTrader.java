@@ -203,6 +203,11 @@ public abstract class AbstractTrader implements Trader, BarListener {
         emitBarsEvent(mainBar, lastBarIdx);
     }
 
+    @Override
+    public void onDividendEvent(Dividend dividend) {
+        // TODO 处理 分红配送(除权除息)
+    }
+
     /**
      * 开仓
      */
@@ -303,7 +308,7 @@ public abstract class AbstractTrader implements Trader, BarListener {
     protected abstract boolean isMarketOpen(String code, Bar bar);
 
     /**
-     * 计算开仓价格
+     * 计算开仓价格(不复权价格)
      *
      * @param bar    Bar数据
      * @param barIdx Bar的索引位置
@@ -311,7 +316,7 @@ public abstract class AbstractTrader implements Trader, BarListener {
     protected abstract double calcEnterPrice(Bar bar, long barIdx);
 
     /**
-     * 计算平仓价格
+     * 计算平仓价格(不复权价格)
      *
      * @param bar    Bar数据
      * @param barIdx Bar的索引位置

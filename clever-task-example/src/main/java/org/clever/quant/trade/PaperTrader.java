@@ -31,11 +31,11 @@ public class PaperTrader extends AbstractTrader {
 
     @Override
     protected double calcEnterPrice(Bar bar, long barIdx) {
-        return bar.getOpen();
+        return bar.getOpen(AdjustType.none);
     }
 
     @Override
     protected double calcExitPrice(Bar bar, long barIdx) {
-        return bar.getOpen();
+        return bar.getOpen(AdjustType.none);
     }
 }

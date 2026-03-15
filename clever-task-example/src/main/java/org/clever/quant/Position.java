@@ -77,7 +77,7 @@ public class Position {
     }
 
     /**
-     * 增持
+     * 增持(无锁定期)
      *
      * @param volume 增加的持仓量
      * @param price  撮合成交价
