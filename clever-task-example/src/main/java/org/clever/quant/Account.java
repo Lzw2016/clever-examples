@@ -54,6 +54,7 @@ public interface Account {
      * 开仓
      *
      * @param barSeries 交易的目标 BarSeries
+     * @param bar       交易的目标 Bar
      * @param barIdx    Bar的索引位置
      * @param price     撮合成交价
      * @param volume    成交量
@@ -66,6 +67,7 @@ public interface Account {
      * 平仓
      *
      * @param barSeries 交易的目标 BarSeries
+     * @param bar       交易的目标 Bar
      * @param barIdx    Bar的索引位置
      * @param price     撮合成交价
      * @param volume    成交量
