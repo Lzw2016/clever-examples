@@ -208,7 +208,7 @@ public class BarSeries extends AbstractExtData {
                     () -> String.format("bar的时间只能在%s之后", DateUtils.formatToString(lastBar.getTime()))
                 );
             }
-            // 处理“分红转送”
+            // 处理“分红配送”
             Dividend dividend = dividends.peek();
             if (dividend != null && Objects.equals(DateUtils.formatToString(bar.getTime(), DateUtils.yyyy_MM_dd), DateUtils.formatToString(dividend.getExDate(), DateUtils.yyyy_MM_dd))) {
                 emitDividendEvent(dividend);
