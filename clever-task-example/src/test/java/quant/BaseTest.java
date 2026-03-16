@@ -221,4 +221,14 @@ public class BaseTest {
             }
         });
     }
+
+    @Test
+    public void t06() {
+        Jdbc jdbc = BaseDataSource.createJdbc();
+        List<Dividend> dividends = BaseDataSource.getDividends(jdbc, "600998.SH");
+        for (Dividend dividend : dividends) {
+            log.info("-> {}", dividend);
+        }
+        jdbc.close();
+    }
 }

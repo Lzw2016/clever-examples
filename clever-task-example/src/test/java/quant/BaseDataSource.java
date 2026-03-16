@@ -16,6 +16,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.clever.core.function.OneConsumer;
 import org.clever.core.function.ThreeConsumer;
 import org.clever.data.jdbc.Jdbc;
+import org.clever.quant.Dividend;
 import ta4j.model.StockBarData;
 
 import java.util.*;
@@ -148,6 +149,21 @@ public class BaseDataSource {
         sql.append("  and b.OpenDate < current_date() - interval 3 year ");
         sql.append("order by a.stock_code ");
         return jdbc.queryMany(sql.toString(), StockSymbol.class);
+    }
+
+    public static List<Dividend> getDividends(Jdbc jdbc, String stockCode) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("select stock_code as code, ");
+        sql.append("       time       as ex_date, ");
+        sql.append("       stockBonus as bonus_ratio, ");
+        sql.append("       stockGift  as transfer_ratio, ");
+        sql.append("       interest   as cash_dividend_per_share, ");
+        sql.append("       allotNum   as ration_ratio, ");
+        sql.append("       allotPrice as ration_price ");
+        sql.append("from stock_dividend_info ");
+        sql.append(String.format("where stock_code='%s' ", stockCode));
+        sql.append("order by time ");
+        return jdbc.queryMany(sql.toString(), Dividend.class);
     }
 
     private static StringBuilder get1dkBarSQL(String stockCode) {
