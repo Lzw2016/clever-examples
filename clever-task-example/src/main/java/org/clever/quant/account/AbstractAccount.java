@@ -117,7 +117,7 @@ public abstract class AbstractAccount implements Account {
             double cashAmount = 0;
             // 现金分红交税金额
             double cashTax = 0;
-            // 送股交税
+            // 送股交税金额
             double bonusTax = 0;
             // 计算新的持仓量
             int newVolume = position.getVolume();
@@ -144,10 +144,11 @@ public abstract class AbstractAccount implements Account {
             // 计算新的可用量
             final int newAvailableVolume = position.getAvailableVolume() + (newVolume - position.getVolume());
             // 计算新的总成本
-            final double addBalance = cashAmount - cashTax - bonusTax;
+            final double dividendTax = cashTax + bonusTax;
+            final double addBalance = cashAmount - dividendTax;
             final double newAmount = position.getVolume() * position.getAvgCostPrice() - addBalance;
             // 计算新的平均成本价
-            double newAvgCostPrice = newAmount / newVolume;
+            final double newAvgCostPrice = newAmount / newVolume;
             // 更新余额
             final double balance = this.balance;
             this.balance = balance + addBalance;
@@ -163,7 +164,7 @@ public abstract class AbstractAccount implements Account {
                 dividend.getCashDividendPerShare(),
                 dividend.getRationRatio(),
                 dividend.getRationPrice(),
-                cashTax + bonusTax
+                dividendTax
             );
             dividendLogs.add(dividendLog);
             return null;
