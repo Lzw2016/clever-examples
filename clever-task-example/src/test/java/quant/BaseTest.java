@@ -229,6 +229,10 @@ public class BaseTest {
         for (Dividend dividend : dividends) {
             log.info("-> {}", dividend);
         }
+        List<DividendInfo> dividendInfos = BaseDataSource.getDividendInfos(jdbc, "600998.SH");
+        for (DividendInfo dividendInfo : dividendInfos) {
+            log.info("-> {}", dividendInfo);
+        }
         jdbc.close();
     }
 }

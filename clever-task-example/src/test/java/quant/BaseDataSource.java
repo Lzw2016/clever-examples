@@ -166,6 +166,16 @@ public class BaseDataSource {
         return jdbc.queryMany(sql.toString(), Dividend.class);
     }
 
+    public static List<DividendInfo> getDividendInfos(Jdbc jdbc, String stockCode) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("select time, ");
+        sql.append("       dr ");
+        sql.append("from stock_dividend_info ");
+        sql.append(String.format("where stock_code='%s' ", stockCode));
+        sql.append("order by time ");
+        return jdbc.queryMany(sql.toString(), DividendInfo.class);
+    }
+
     private static StringBuilder get1dkBarSQL(String stockCode) {
         StringBuilder sql = new StringBuilder();
         sql.append("select * from xtquant.stock_1dk_bar ");
