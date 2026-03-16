@@ -205,7 +205,10 @@ public abstract class AbstractTrader implements Trader, BarListener {
 
     @Override
     public void onDividendEvent(Dividend dividend, Bar bar, long barIdx) {
-        account.processDividend(dividend, bar, barIdx);
+        DividendLog dividendLog = account.processDividend(dividend, bar, barIdx);
+        if (dividendLog != null) {
+            emitDividend(dividendLog, account, barIdx);
+        }
     }
 
     /**
@@ -261,6 +264,20 @@ public abstract class AbstractTrader implements Trader, BarListener {
                 listener.onBars(mainBar, bars, barIdx);
             } catch (Exception err) {
                 log.error("onBars事件回调异常, listener={}", listener, err);
+                // System.exit(-1);
+            }
+        }
+    }
+
+    /**
+     * 处理“分红配送”之后
+     */
+    protected void emitDividend(DividendLog dividendLog, Account account, long barIdx) {
+        for (TradeListener listener : listeners) {
+            try {
+                listener.onDividend(dividendLog, account, barIdx);
+            } catch (Exception err) {
+                log.error("onDividend事件回调异常, listener={}", listener, err);
                 // System.exit(-1);
             }
         }

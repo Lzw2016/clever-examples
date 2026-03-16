@@ -67,6 +67,17 @@ public abstract class AbstractAccount implements Account {
     }
 
     @Override
+    public List<DividendLog> getDividendLogs() {
+        return syncRead(() -> Collections.unmodifiableList(dividendLogs));
+    }
+
+    @Override
+    public List<DividendLog> getDividendLogs(String code) {
+        Assert.isNotBlank(code, "参数 code 不能为空");
+        return syncRead(() -> dividendLogs.stream().filter(dividendLog -> Objects.equals(dividendLog.getCode(), code)).toList());
+    }
+
+    @Override
     public List<TradeLog> getTradeLogs() {
         return syncRead(() -> Collections.unmodifiableList(tradeLogs));
     }
@@ -94,12 +105,12 @@ public abstract class AbstractAccount implements Account {
     }
 
     @Override
-    public void processDividend(Dividend dividend, Bar bar, long barIdx) {
+    public DividendLog processDividend(Dividend dividend, Bar bar, long barIdx) {
         Position position = positions.get(dividend.getCode());
         if (position == null) {
-            return;
+            return null;
         }
-        syncWrite(() -> {
+        return syncWrite(() -> {
             // 计算红利税
             // 持股 ≤ 1个月	20%	应纳税额 = 送股数量 × 1元 × 20%
             // 1个月 < 持股 ≤ 1年	10%	应纳税额 = 送股数量 × 1元 × 10%
@@ -167,7 +178,7 @@ public abstract class AbstractAccount implements Account {
                 dividendTax
             );
             dividendLogs.add(dividendLog);
-            return null;
+            return dividendLog;
         });
     }
 

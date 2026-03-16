@@ -26,6 +26,10 @@ public class BacktestPositions {
      */
     private Long barIdx;
     /**
+     * 连续持仓时间(天)
+     */
+    private Integer holdDays;
+    /**
      * 金融产品编码
      */
     private String code;

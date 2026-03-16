@@ -20,6 +20,16 @@ public interface TradeListener {
     }
 
     /**
+     * 处理“分红配送”之后的回调通知
+     *
+     * @param dividendLog 分红配送日志
+     * @param account     交易账户
+     * @param barIdx      Bar的索引位置
+     */
+    default void onDividend(DividendLog dividendLog, Account account, long barIdx) {
+    }
+
+    /**
      * 开仓时回调通知
      *
      * @param tradeLog 交易日志

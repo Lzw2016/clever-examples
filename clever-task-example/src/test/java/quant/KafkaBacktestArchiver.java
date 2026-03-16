@@ -97,6 +97,8 @@ public class KafkaBacktestArchiver extends AbstractBacktestArchiver {
             tableName = "backtest_account_snapshot";
         } else if (data instanceof BacktestPositions) {
             tableName = "backtest_positions";
+        } else if (data instanceof BacktestDividendLog) {
+            tableName = "backtest_dividend_log";
         } else if (data instanceof BacktestTradeLog) {
             tableName = "backtest_trade_log";
         } else {

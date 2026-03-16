@@ -3,6 +3,7 @@ package org.clever.quant.archive;
 import lombok.Getter;
 import org.clever.core.Assert;
 import org.clever.core.Conv;
+import org.clever.core.DateUtils;
 import org.clever.core.id.SnowFlake;
 import org.clever.core.reflection.ReflectionsUtils;
 import org.clever.quant.*;
@@ -200,10 +201,16 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         final BacktestAccountSnapshot backtestAccountSnapshot = createBacktestAccountSnapshot(backtestRecord, accountSnapshot, priceTable, barIdx);
         saveData(backtestAccountSnapshot);
         final List<BacktestPositions> backtestPositions = accountSnapshot.getPositions().values().stream()
-            .map(position -> createBacktestPositions(backtestRecord, position, barIdx))
+            .map(position -> createBacktestPositions(backtestRecord, position, mainBar.getTime(), barIdx))
             .sorted(Comparator.comparing(BacktestPositions::getCode))
             .toList();
         saveData(backtestPositions);
+    }
+
+    @Override
+    public synchronized void onDividend(DividendLog dividendLog, Account account, long barIdx) {
+        final BacktestDividendLog backtestDividendLog = createBacktestDividendLog(backtestRecord, dividendLog, barIdx);
+        saveData(backtestDividendLog);
     }
 
     @Override
@@ -365,11 +372,12 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         return backtestAccountSnapshot;
     }
 
-    protected BacktestPositions createBacktestPositions(BacktestRecord backtestRecord, Position position, long barIdx) {
+    protected BacktestPositions createBacktestPositions(BacktestRecord backtestRecord, Position position, Date barTime, long barIdx) {
         BacktestPositions backtestPositions = new BacktestPositions();
         backtestPositions.setId(SnowFlake.SNOW_FLAKE.nextId());
         backtestPositions.setBacktestRecordId(backtestRecord.getId());
         backtestPositions.setBarIdx(barIdx);
+        backtestPositions.setHoldDays(DateUtils.pastDays(position.getFirstEntryTime(), barTime));
         backtestPositions.setCode(position.getCode());
         backtestPositions.setVolume(position.getVolume());
         backtestPositions.setAvailableVolume(position.getAvailableVolume());
@@ -379,9 +387,27 @@ public abstract class AbstractBacktestArchiver implements BacktestArchiver, Trad
         return backtestPositions;
     }
 
+    protected BacktestDividendLog createBacktestDividendLog(BacktestRecord backtestRecord, DividendLog dividendLog, long barIdx) {
+        BacktestDividendLog backtestDividendLog = new BacktestDividendLog();
+        backtestDividendLog.setId(dividendLog.getId());
+        backtestDividendLog.setBacktestRecordId(backtestRecord.getId());
+        backtestDividendLog.setBarIdx(barIdx);
+        backtestDividendLog.setCode(dividendLog.getCode());
+        backtestDividendLog.setExDate(dividendLog.getExDate());
+        backtestDividendLog.setBonusRatio(Conv.asDecimal(dividendLog.getBonusRatio()));
+        backtestDividendLog.setTransferRatio(Conv.asDecimal(dividendLog.getTransferRatio(), null));
+        backtestDividendLog.setCashDividendPerShare(Conv.asDecimal(dividendLog.getCashDividendPerShare()));
+        backtestDividendLog.setRationRatio(Conv.asDecimal(dividendLog.getRationRatio()));
+        backtestDividendLog.setRationPrice(Conv.asDecimal(dividendLog.getRationPrice()));
+        backtestDividendLog.setDividendTax(Conv.asDecimal(dividendLog.getDividendTax()));
+        backtestDividendLog.setCreateAt(new Date());
+        backtestDividendLog.setDelFlag(0);
+        return backtestDividendLog;
+    }
+
     protected BacktestTradeLog createBacktestTradeLog(BacktestRecord backtestRecord, TradeLog tradeLog, long barIdx) {
         BacktestTradeLog backtestTradeLog = new BacktestTradeLog();
-        backtestTradeLog.setId(SnowFlake.SNOW_FLAKE.nextId());
+        backtestTradeLog.setId(tradeLog.getId());
         backtestTradeLog.setBacktestRecordId(backtestRecord.getId());
         backtestTradeLog.setBarIdx(barIdx);
         backtestTradeLog.setCode(tradeLog.getCode());

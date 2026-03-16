@@ -26,6 +26,18 @@ public interface Account {
     double getBalance();
 
     /**
+     * 所有的分红配送日志
+     */
+    List<DividendLog> getDividendLogs();
+
+    /**
+     * 指定的“金融产品”的分红配送日志
+     *
+     * @param code 金融产品编码
+     */
+    List<DividendLog> getDividendLogs(String code);
+
+    /**
      * 所有的历史交易日志
      */
     List<TradeLog> getTradeLogs();
@@ -82,8 +94,9 @@ public interface Account {
      * @param dividend 分红配送数据
      * @param bar      交易的目标 Bar
      * @param barIdx   除权除息日期所对应的Bar的索引位置
+     * @return 如果需求处理分红配送返回对应的日志，否则返回 null
      */
-    void processDividend(Dividend dividend, Bar bar, long barIdx);
+    DividendLog processDividend(Dividend dividend, Bar bar, long barIdx);
 
     /**
      * 获取当前账户的总资产
