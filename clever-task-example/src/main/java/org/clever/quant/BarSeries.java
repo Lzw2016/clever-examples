@@ -208,17 +208,17 @@ public class BarSeries extends AbstractExtData {
                     () -> String.format("bar的时间只能在%s之后", DateUtils.formatToString(lastBar.getTime()))
                 );
             }
-            // 处理“分红配送”
-            Dividend dividend = dividends.peek();
-            if (dividend != null && Objects.equals(DateUtils.formatToString(bar.getTime(), DateUtils.yyyy_MM_dd), DateUtils.formatToString(dividend.getExDate(), DateUtils.yyyy_MM_dd))) {
-                emitDividendEvent(dividend);
-                dividends.poll();
-            }
             // 新增 bar 驱动交易
             long barIdx = buffer.add(bar, this::emitRemoveBarEvent);
             Assert.isTrue(barIdx >= 0, "追加 Bar 失败");
             lastBar = bar;
             emitAppendBarEvent(bar, barIdx);
+            // 处理“分红配送”
+            Dividend dividend = dividends.peek();
+            if (dividend != null && Objects.equals(DateUtils.formatToString(bar.getTime(), DateUtils.yyyy_MM_dd), DateUtils.formatToString(dividend.getExDate(), DateUtils.yyyy_MM_dd))) {
+                emitDividendEvent(dividend, bar, barIdx);
+                dividends.poll();
+            }
         }
     }
 
@@ -284,10 +284,10 @@ public class BarSeries extends AbstractExtData {
     /**
      * 触发分红配送(除权除息)事件
      */
-    protected void emitDividendEvent(Dividend dividend) {
+    protected void emitDividendEvent(Dividend dividend, Bar bar, long barIdx) {
         for (BarListener listener : listeners) {
             try {
-                listener.onDividendEvent(dividend);
+                listener.onDividendEvent(dividend, bar, barIdx);
             } catch (Exception err) {
                 log.error("onDividendEvent事件回调异常, listener={}", listener, err);
                 // System.exit(-1);

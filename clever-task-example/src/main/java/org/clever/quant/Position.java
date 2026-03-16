@@ -25,6 +25,10 @@ public class Position {
      */
     private final String code;
     /**
+     * 建仓时间
+     */
+    private final Date firstEntryTime;
+    /**
      * 持有总量
      */
     private int volume;
@@ -44,12 +48,14 @@ public class Position {
     /**
      * @param code 金融产品编码
      */
-    public Position(String code) {
+    public Position(String code, Date firstEntryTime) {
         Assert.isNotBlank(code, "参数 code 不能为空");
+        Assert.notNull(firstEntryTime, "参数 firstEntryTime 不能为 null");
         this.code = code;
         this.volume = 0;
         this.availableVolume = 0;
         this.avgCostPrice = 0;
+        this.firstEntryTime = firstEntryTime;
     }
 
     /**
@@ -74,6 +80,19 @@ public class Position {
         lockVolumes.entrySet().removeIf(entry -> entry.getKey().compareTo(unlockTime) <= 0);
         availableVolume = availableVolume + unlockedVolume;
         return availableVolume;
+    }
+
+    /**
+     * 根据“分红配送”处理结果更新持仓信息
+     *
+     * @param volume          持有总量
+     * @param availableVolume 可用量
+     * @param avgCostPrice    平均成本价
+     */
+    public synchronized void updateForDividend(int volume, int availableVolume, double avgCostPrice) {
+        this.volume = volume;
+        this.availableVolume = availableVolume;
+        this.avgCostPrice = avgCostPrice;
     }
 
     /**

@@ -77,6 +77,15 @@ public interface Account {
     TradeLog exit(BarSeries barSeries, Bar bar, long barIdx, double price, int volume, double fee);
 
     /**
+     * 处理分红配送(除权除息)
+     *
+     * @param dividend 分红配送数据
+     * @param bar      交易的目标 Bar
+     * @param barIdx   除权除息日期所对应的Bar的索引位置
+     */
+    void processDividend(Dividend dividend, Bar bar, long barIdx);
+
+    /**
      * 获取当前账户的总资产
      *
      * @param priceTable 资产价格表 {@code Map<code, price>}

@@ -31,7 +31,9 @@ public interface BarListener {
      * 注意：该事件会在除权除息日对应的Bar处理完成后触发
      *
      * @param dividend 分红配送数据
+     * @param bar      Bar数据
+     * @param barIdx   除权除息日期所对应的Bar的索引位置
      */
-    default void onDividendEvent(Dividend dividend) {
+    default void onDividendEvent(Dividend dividend, Bar bar, long barIdx) {
     }
 }

@@ -204,8 +204,8 @@ public abstract class AbstractTrader implements Trader, BarListener {
     }
 
     @Override
-    public void onDividendEvent(Dividend dividend) {
-        // TODO 处理 分红配送(除权除息)
+    public void onDividendEvent(Dividend dividend, Bar bar, long barIdx) {
+        account.processDividend(dividend, bar, barIdx);
     }
 
     /**

@@ -15,7 +15,7 @@ import java.util.Date;
 @Data
 public class TradeLog {
     /**
-     * 交易id
+     * 日志id
      */
     private final long id = SnowFlake.SNOW_FLAKE.nextId();
     /**
