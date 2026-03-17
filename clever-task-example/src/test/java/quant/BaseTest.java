@@ -78,7 +78,7 @@ public class BaseTest {
                 account.exit(barSeries, bar, barIdx, bar.getClose(AdjustType.none), 1000, 5);
             }
         });
-        Jdbc jdbc = BaseDataSource.createDorisJdbc();
+        Jdbc jdbc = BaseDataSource.createJdbc();
         String stockCode = "600998.SH";
         BaseDataSource.get1dkBar(jdbc, stockCode, stockBarData -> {
             Bar bar = Bar.builder()
@@ -102,11 +102,15 @@ public class BaseTest {
     @SneakyThrows
     @Test
     public void t03() {
-        Jdbc jdbc = BaseDataSource.createDorisJdbc();
+        Jdbc jdbc = BaseDataSource.createJdbc();
         Admin admin = BaseDataSource.createKafkaAdmin();
         KafkaProducer<String, String> kafkaProducer = BaseDataSource.createKafkaProducer();
 
-        BarSeries barSeries = new BarSeries(new ArrayList<>());
+        final String stockCode = "600998.SH";
+        final List<Dividend> dividends = BaseDataSource.getDividends(jdbc, stockCode);
+        final List<DividendInfo> dividendInfos = BaseDataSource.getDividendInfos(jdbc, stockCode);
+        final AdjustPriceCalc adjustPriceCalc = new XTAdjustPriceCalc(dividendInfos);
+        BarSeries barSeries = new BarSeries(dividends);
         barSeries.addExtData(BarSeries.EXT_SOURCE, "xtquant");
         barSeries.addExtData(BarSeries.EXT_TABLE_NAME, "stock_1dk_bar");
         Indicator<Double> closePrice = new ClosePriceIndicator(barSeries);
@@ -120,8 +124,8 @@ public class BaseTest {
         trader.registerTradeListener(new TradeLogger());
         trader.start(barSeries);
         BacktestArchiver backtestArchiver = new KafkaBacktestArchiver(
-            "均线相交策略",
-            "600998",
+            "均线相交(反向)",
+            stockCode,
             account,
             barSeries,
             new HashSet<>(),
@@ -133,7 +137,7 @@ public class BaseTest {
             "quant_data"
         );
         backtestArchiver.start(trader);
-        String stockCode = "600998.SH";
+
         Map<String, Double> priceTable = new HashMap<>();
         log.info("初始资产: {}", String.format("%.2f", account.getTotalAssets(priceTable)));
         BaseDataSource.get1dkBar(jdbc, stockCode, stockBarData -> {
@@ -147,6 +151,7 @@ public class BaseTest {
                 .close(stockBarData.getClose().doubleValue())
                 .volume(stockBarData.getVolume())
                 .amount(stockBarData.getAmount().doubleValue())
+                .adjustPriceCalc(adjustPriceCalc)
                 .build();
             barSeries.appendBar(bar);
             priceTable.put(bar.getCode(), bar.getClose(AdjustType.none));
@@ -172,7 +177,10 @@ public class BaseTest {
                     log.info("[{}] 没有数据跳过", stockSymbol.getCode());
                     continue;
                 }
-                BarSeries barSeries = new BarSeries(new ArrayList<>());
+                final List<Dividend> dividends = BaseDataSource.getDividends(jdbc, stockSymbol.getCode());
+                final List<DividendInfo> dividendInfos = BaseDataSource.getDividendInfos(jdbc, stockSymbol.getCode());
+                final AdjustPriceCalc adjustPriceCalc = new XTAdjustPriceCalc(dividendInfos);
+                BarSeries barSeries = new BarSeries(dividends);
                 barSeries.addExtData(BarSeries.EXT_SOURCE, "xtquant");
                 barSeries.addExtData(BarSeries.EXT_TABLE_NAME, "stock_1dk_bar");
                 Indicator<Double> closePrice = new ClosePriceIndicator(barSeries);
@@ -211,7 +219,7 @@ public class BaseTest {
                         .close(stockBarData.getClose().doubleValue())
                         .volume(stockBarData.getVolume())
                         .amount(stockBarData.getAmount().doubleValue())
-                        .adjustPriceCalc(null)
+                        .adjustPriceCalc(adjustPriceCalc)
                         .build();
                     barSeries.appendBar(bar);
                     priceTable.put(bar.getCode(), bar.getClose(AdjustType.none));

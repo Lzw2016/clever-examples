@@ -115,7 +115,7 @@ public class Ta4j01Test {
             null,
             null
         );
-        Jdbc jdbc = BaseDataSource.createDorisJdbc();
+        Jdbc jdbc = BaseDataSource.createJdbc();
         String stockCode = "600998.SH";
         BaseDataSource.get1dkBar(jdbc, stockCode, stockBarData -> {
             Bar bar = new TimeBarBuilder(DecimalNumFactory.getInstance())
@@ -195,7 +195,7 @@ public class Ta4j01Test {
         BarSeries barSeries = new BaseBarSeriesBuilder()
             .withName("测试")
             .build();
-        Jdbc jdbc = BaseDataSource.createDorisJdbc();
+        Jdbc jdbc = BaseDataSource.createJdbc();
         String stockCode = "600998.SH";
         BaseDataSource.get1dkBar(jdbc, stockCode, stockBarData -> {
             Bar bar = new TimeBarBuilder(DecimalNumFactory.getInstance())

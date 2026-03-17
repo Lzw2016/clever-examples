@@ -28,23 +28,23 @@ import java.util.*;
 @SuppressWarnings("StringBufferReplaceableByString")
 @Slf4j
 public class BaseDataSource {
-    public static Jdbc createDorisJdbc() {
-        HikariConfig hikariConfig = new HikariConfig();
-        //hikariConfig.setDriverClassName("org.apache.arrow.driver.jdbc.ArrowFlightJdbcDriver");
-        hikariConfig.setDriverClassName("com.p6spy.engine.spy.P6SpyDriver");
-        hikariConfig.setJdbcUrl("jdbc:p6spy:arrow-flight-sql://192.168.1.201:8070?useServerPrepStmts=false&cachePrepStmts=true&useSSL=false&useEncryption=false");
-        hikariConfig.setUsername("admin");
-        hikariConfig.setPassword("admin123456");
-        hikariConfig.setAutoCommit(false);
-        hikariConfig.setMinimumIdle(1);
-        hikariConfig.setMaximumPoolSize(512);
-        return new Jdbc(hikariConfig);
-    }
+    // public static Jdbc createDorisJdbc() {
+    //     HikariConfig hikariConfig = new HikariConfig();
+    //     //hikariConfig.setDriverClassName("org.apache.arrow.driver.jdbc.ArrowFlightJdbcDriver");
+    //     hikariConfig.setDriverClassName("com.p6spy.engine.spy.P6SpyDriver");
+    //     hikariConfig.setJdbcUrl("jdbc:p6spy:arrow-flight-sql://192.168.1.201:8070?useServerPrepStmts=false&cachePrepStmts=true&useSSL=false&useEncryption=false");
+    //     hikariConfig.setUsername("admin");
+    //     hikariConfig.setPassword("admin123456");
+    //     hikariConfig.setAutoCommit(false);
+    //     hikariConfig.setMinimumIdle(1);
+    //     hikariConfig.setMaximumPoolSize(512);
+    //     return new Jdbc(hikariConfig);
+    // }
 
     public static Jdbc createJdbc() {
         HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        hikariConfig.setJdbcUrl("jdbc:mysql://192.168.1.201:9030/xtquant");
+        hikariConfig.setDriverClassName("com.p6spy.engine.spy.P6SpyDriver");
+        hikariConfig.setJdbcUrl("jdbc:p6spy:mysql://192.168.1.201:9030/xtquant");
         hikariConfig.setUsername("admin");
         hikariConfig.setPassword("admin123456");
         hikariConfig.setAutoCommit(false);
@@ -142,7 +142,7 @@ public class BaseDataSource {
         sql.append("select distinct ");
         sql.append("    a.stock_code as code, ");
         sql.append("    b.InstrumentName as name ");
-        sql.append("from xtquant.stock_sector a left join xtquant.instrument_info b on (a.stock_code=concat(b.ExchangeCode, '.', b.ExchangeID)) ");
+        sql.append("from stock_sector a left join instrument_info b on (a.stock_code=concat(b.ExchangeCode, '.', b.ExchangeID)) ");
         sql.append("where a.sector_name in ('沪深A股', '沪深ETF') ");
         sql.append("  and length(a.stock_code) > 3 ");
         sql.append("  and b.InstrumentName not like '%ST%' ");
@@ -178,7 +178,7 @@ public class BaseDataSource {
 
     private static StringBuilder get1dkBarSQL(String stockCode) {
         StringBuilder sql = new StringBuilder();
-        sql.append("select * from xtquant.stock_1dk_bar ");
+        sql.append("select * from stock_1dk_bar ");
         sql.append("where suspendFlag=0 ");
         sql.append(String.format("and stock_code='%s' ", stockCode));
         sql.append("order by time asc ");
