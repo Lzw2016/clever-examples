@@ -24,7 +24,6 @@ object Ver {
 
 buildscript {
     repositories {
-        mavenLocal()
         maven("https://maven.aliyun.com/repository/public/")
         maven("https://maven.aliyun.com/repository/central")
         mavenCentral()
@@ -44,8 +43,8 @@ plugins {
 
 idea {
     project {
-        jdkName = "17"
-        languageLevel = IdeaLanguageLevel("17")
+        jdkName = "21"
+        languageLevel = IdeaLanguageLevel("21")
     }
     module {
         isDownloadJavadoc = true
@@ -60,7 +59,6 @@ allprojects {
     version = "${buildVersion}-${if (buildSnapshot) "SNAPSHOT" else "RELEASE"}"
 
     repositories {
-        mavenLocal()
         mavenCentral()
         maven(url = "https://maven.aliyun.com/repository/public/")
         maven(url = "https://packages.confluent.io/maven/")
@@ -74,8 +72,8 @@ allprojects {
         // resolutionStrategy.cacheChangingModulesFor(0, "seconds")
     }
 
-    java.sourceCompatibility = JavaVersion.VERSION_21
-    java.targetCompatibility = JavaVersion.VERSION_21
+    java.sourceCompatibility = JavaVersion.VERSION_17
+    java.targetCompatibility = JavaVersion.VERSION_17
 
     tasks.compileJava {
         options.encoding = "UTF-8"
